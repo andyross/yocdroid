@@ -10,8 +10,13 @@ BB_ENV_EXTRAWHITE = MACHINE DISTRO TCMODE TCLIBC http_proxy ftp_proxy	\
 
 export OEROOT PATH BB_ENV_EXTRAWHITE
 
-all:
+all: pokycheck
 	bitbake yocdroid-image
+
+pokycheck:
+	@test -f poky/meta/conf/layer.conf || { \
+	    echo Poky Linux tree not found under ./poky.  Please make a symlink.; \
+	    exit 1; }
 
 distclean:
 	rm -rf sstate-cache tmp
