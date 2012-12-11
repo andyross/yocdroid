@@ -1,0 +1,6 @@
+bitbake.lock
+conf/sanity_info
+poky
+pseudodone
+sstate-cache/
+tmp/
