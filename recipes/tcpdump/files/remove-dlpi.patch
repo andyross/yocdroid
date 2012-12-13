@@ -1,0 +1,19 @@
+Solaris-only feature, and the -L/lib produces a Yocto error due to
+potential host pollution.
+
+Upstream-status: inappropriate (embedded)
+
+diff --git a/configure.in b/configure.in
+index 8864238..1e3328d 100644
+--- a/configure.in
++++ b/configure.in
+@@ -702,9 +702,6 @@ don't.])
+ 	fi
+ fi
+ 
+-# libdlpi is needed for Solaris 11 and later.
+-AC_CHECK_LIB(dlpi, dlpi_walk, LIBS="$LIBS -ldlpi" LDFLAGS="-L/lib $LDFLAGS", ,-L/lib)
+-
+ dnl portability macros for getaddrinfo/getnameinfo
+ dnl
+ dnl Check for sa_len
