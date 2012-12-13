@@ -1,0 +1,17 @@
+Change /dev/log to /dev/syslog to avoid collision with Android
+/dev/log directory.
+
+Upstream-status: inappropriate (Android-specific)
+
+diff --git a/bits/syslog-path.h b/bits/syslog-path.h
+index 8c6f43c..578d95c 100644
+--- a/bits/syslog-path.h
++++ b/bits/syslog-path.h
+@@ -23,6 +23,6 @@
+ #ifndef _BITS_SYSLOG_PATH_H
+ #define _BITS_SYSLOG_PATH_H 1
+ 
+-#define	_PATH_LOG	"/dev/log"
++#define	_PATH_LOG	"/dev/syslog"
+ 
+ #endif /* bits/syslog-path.h */
