@@ -73,6 +73,7 @@ IMAGE_INSTALL = " \
     sysstat \
     sysvinit \
     tar \
+    tcpdump \
     tcp-wrappers \
     time \
     tzdata \
