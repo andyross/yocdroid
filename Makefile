@@ -18,5 +18,16 @@ pokycheck:
 	    echo Poky Linux tree not found under ./poky.  Please make a symlink.; \
 	    exit 1; }
 
+.PHONY: bbwrap
+
+bbwrap:
+	@echo "#!/bin/sh" > bbwrap
+	@echo "OEROOT=$(OEROOT)" >> bbwrap
+	@echo "PATH=$(PATH)" >> bbwrap
+	@echo "BB_ENV_EXTRAWHITE=\"$(BB_ENV_EXTRAWHITE)\"" >> bbwrap
+	@echo "unset DISPLAY" >> bbwrap
+	@echo 'exec bitbake "$$@"' >> bbwrap
+	@chmod 755 bbwrap
+
 distclean:
 	rm -rf sstate-cache tmp

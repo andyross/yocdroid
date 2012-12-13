@@ -1,0 +1,53 @@
+BUGS:
+
++ The mount copies are static and don't track changes to the
+  filesystem (e.g. app asec mounts, user switching.  Amusingly the
+  sdcard virtual filesystme works fine as the FUSE mount is static...)
+  automatically.  This could be handled with a small daemon listening
+  on a netlink socket.
+
++ There is no integration with the Android user/group IDs.  Everything
+  but root appears as a numeric ID to the linux personality.
+  Amusingly, the list is statically defined (in C code!) in
+  system/core/include/private/android_filesystem_config.h.  Just cook
+  that into a /etc/passwd file.
+
++ The /etc/mtab file should be a link to /proc/mounts but isn't
+
++ uptime reports "Unknown HZ value! (xx) Assume 100."
+
++ syslog doesn't work due to a filesystem namespace collision.  On
+  android "/dev/log" is a directory, not a syslog socket.  This is
+  defined in eglibc as _PATH_LOG in a header, and I think that should
+  be sufficient to fix it.
+
++ Even so, /proc/kmsg doesn't duplicate messages, so no kernel
+  logging for syslog.  The klogd component needs to be disabled when
+  starting syslogd.
+
++ The nosuid flag for /data is inherited by the bind mount, so suid
+  binaries won't work.  For remote access via a root shell in adb
+  that's fine, but local access from an app (e.g. Term.apk) context
+  requires a working su.
+
++ Passwordless root login in sshd is borked somehow; you have to set a
+  password with /usr/bin/passwd or add a key.  Frankly this is
+  probably for the best.
+
++ acpid won't start without the /etc/acpi/events directory being present
+
++ gdb doesn't understand the android linker paths, and android
+  binaries don't use RPATH to tell it.  Use "set solib-search-path
+  /system/lib" to work around.  This should work in an /etc/gdbinit
+  file, but it didn't for me the first time I tried.
+
++ gdb doesn't seem to understand threads.  With ps -eLf I can see
+  multiple threads, but "thread 2" in the attached process gives me
+  nothing (I can attach to the thread's tid directly, however).  Is
+  it relying on a pthread/nptl implementation that bionic doesn't
+  do?
+
++ /etc/profile et. al. need to add /system/{bin,xbin} to the PATH
+
++ The environment pruning is too aggressive.  Some android variables
+  should be preserved...
