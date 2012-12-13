@@ -1,0 +1,32 @@
+Yocdroid is a Linux userspace environment for use on Android devices
+based on the Yocto Linux Project's distribution build system.
+
+With it, you can have a (more or less) fully integratied "real" Linux
+command line environment on your Android machine without losing the
+ability to interoperate with the core Android world.  For example:
+
++ bash, perl, python, ssh, nc, curl, wget.  Cron jobs!  Hook /etc/rc.local!
+
++ Terminals spawned from ssh instead of adb understand SIGWINCH and
+  get proper settings for LINES/COLUMNS.
+
++ Run lspci/lsusb to get human-readable output.
+
++ Run acpid/acpi_listen to inspect firmware events.
+
++ Run android stuff: "getprop ro.whatever", "pm install
+  something.apk", "am start ...".  Script activity and intent
+  management using robust tools.
+
++ Attach gdb or strace to an android process.
+
++ netstat, iptables
+
++ {TODO} tcpdump
+
++ {TODO} Launch a dalvik app under valgrind with "valgrind app_process ..."
+
++ {TODO} Mount the android filesystem locally via sshfs
+
++ {TODO} Find your device on any local network via Avahi/Zeroconf
+  ("avahi-browse -a", "ssh ydroid-ivb-andy.local")

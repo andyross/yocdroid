@@ -4,3 +4,4 @@ poky
 pseudodone
 sstate-cache/
 tmp/
+bbwrap

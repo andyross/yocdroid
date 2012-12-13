@@ -12,14 +12,15 @@ BUGS:
   system/core/include/private/android_filesystem_config.h.  Just cook
   that into a /etc/passwd file.
 
-+ The /etc/mtab file should be a link to /proc/mounts but isn't
++ (MAYBE FIXED) The /etc/mtab file should be a link to /proc/mounts
+  but isn't
 
 + uptime reports "Unknown HZ value! (xx) Assume 100."
 
-+ syslog doesn't work due to a filesystem namespace collision.  On
-  android "/dev/log" is a directory, not a syslog socket.  This is
-  defined in eglibc as _PATH_LOG in a header, and I think that should
-  be sufficient to fix it.
++ (MAYBE FIXED) syslog doesn't work due to a filesystem namespace
+  collision.  On android "/dev/log" is a directory, not a syslog
+  socket.  This is defined in eglibc as _PATH_LOG in a header, and I
+  think that should be sufficient to fix it.
 
 + Even so, /proc/kmsg doesn't duplicate messages, so no kernel
   logging for syslog.  The klogd component needs to be disabled when

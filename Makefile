@@ -10,24 +10,25 @@ BB_ENV_EXTRAWHITE = MACHINE DISTRO TCMODE TCLIBC http_proxy ftp_proxy	\
 
 export OEROOT PATH BB_ENV_EXTRAWHITE
 
-all: pokycheck
+image: pokycheck
 	bitbake yocdroid-image
 
-pokycheck:
+pokycheck: bbwrap
 	@test -f poky/meta/conf/layer.conf || { \
-	    echo Poky Linux tree not found under ./poky.  Please make a symlink.; \
+	    echo Poky Linux tree not found under ./poky.  See INSTALL.; \
 	    exit 1; }
 
 .PHONY: bbwrap
 
 bbwrap:
-	@echo "#!/bin/sh" > bbwrap
-	@echo "OEROOT=$(OEROOT)" >> bbwrap
-	@echo "PATH=$(PATH)" >> bbwrap
-	@echo "BB_ENV_EXTRAWHITE=\"$(BB_ENV_EXTRAWHITE)\"" >> bbwrap
-	@echo "unset DISPLAY" >> bbwrap
-	@echo 'exec bitbake "$$@"' >> bbwrap
-	@chmod 755 bbwrap
+	@echo "#!/bin/sh" > $@
+	@echo "OEROOT=$(OEROOT)" >> $@
+	@echo "PATH=$(PATH)" >> $@
+	@echo "BB_ENV_EXTRAWHITE=\"$(BB_ENV_EXTRAWHITE)\"" >> $@
+	@echo "unset DISPLAY" >> $@
+	@echo "export OEROOT BB_ENV_EXTRAWHITE" >> $@
+	@echo 'exec bitbake "$$@"' >> $@
+	@chmod 755 $@
 
 distclean:
-	rm -rf sstate-cache tmp
+	rm -rf sstate-cache tmp bbwrap bitbake.lock pseudodone

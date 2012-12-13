@@ -1,0 +1,19 @@
+You will need a Poky linux tree in the local directory (a symlink
+works fine) as "./poky".  You can get this from the upstream git with:
+
+    git clone git://git.yoctoproject.org/poky
+
+Building an x86 image is as simple as "make".  The output tarball will
+appear in tmp/deploy/images.  Simply unpack this under /data/y on your
+Android device.
+
+If you want to work directly with bitbake, the Makefile will create a
+"bbwrap" wrapper script for you ("make bbwrap") which sets up the
+environment correctly and then launches bitbake.  So e.g. "./bbwrap -c
+devshell my-package-name" does what you want.
+
+You may edit the installed package list in
+recipes/yocdroid-image/yocdroid-image.bb.  The IMAGE_FEATURES
+mechanism from Yocto works as well, but be careful with it because
+many of the existing default package lists tend to pull in unwanted
+dependencies.
