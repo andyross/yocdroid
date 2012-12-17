@@ -1,0 +1,19 @@
+#!/system/bin/sh
+
+# FIXME: busybox needed for env and sed.
+export PATH=/system/xbin/busybox:/system/bin:/system/xbin
+
+D=/data/y
+
+# Finally enter the chroot, clear the environment and launch a shell
+cd $D
+for i in $(env | sed 's/=.*//'); do unset $i; done
+export PATH=/bin:/sbin:/usr/bin:/usr/sbin:/system/bin:/system/xbin
+export TERM=xterm
+export HOME=/home/root
+
+if [ -z "$1" ]; then
+    exec $D/sbin/chroot-static $D /bin/bash -l
+else
+    exec $D/sbin/chroot-static $D "$@"
+fi

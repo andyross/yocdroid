@@ -1,0 +1,33 @@
+#!/system/bin/sh
+
+# Bring up a Yocto chroot on Android
+#
+# This bootstrap shell script is designed to run using only the
+# Android toolbox environment.
+
+export PATH=/system/bin:/system/xbin:/system/xbin/busybox
+
+D=/data/y
+
+domount() {
+    fs=$1
+    awk '{print $2}' /proc/mounts | grep -q "^$D$fs$" && return
+    mkdir -p "$D/$fs"
+    mount -o bind "$fs" "$D$fs"
+}
+
+# Bind mount all filesystems under $D, except (obviously) for the
+# root, and also the filesystem that contains $D (hardcoded to /data
+# here) which must be done last (see below).
+for i in `awk '{print $2}' /proc/mounts | grep -v "^$D" | sort`; do
+    if test "$i" != "/" -a "$i" != "/data"; then
+	domount $i
+    fi
+done
+
+# Presumptive bug (or a feature I don't understand) workaround: do
+# /data last because mounting something inside a directory that has
+# already been bind mounted actually doubles the depth.  That is, if
+# "/data/y/data" is already a bind mount to "/data", then mounting
+# "/data/y/acct" actually puts the mount under "/data/y/data/y/acct"
+domount /data
