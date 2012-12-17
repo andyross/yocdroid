@@ -5,24 +5,29 @@ With it, you can have a (more or less) fully integratied "real" Linux
 command line environment on your Android machine without losing the
 ability to interoperate with the core Android world.  For example:
 
-+ bash, perl, python, ssh, nc, curl, wget.  Cron jobs!  Hook /etc/rc.local!
++ bash, perl, python, ssh, nc, curl, wget.  Cron jobs!  Hook
+  /etc/rc.local!  Use "file" on unknown data.
 
 + Terminals spawned from ssh instead of adb understand SIGWINCH and
-  get proper settings for LINES/COLUMNS.
+  get proper settings for LINES/COLUMNS.  No more broken terminal
+  output.
 
 + Run lspci/lsusb to get human-readable output.
 
 + Run acpid/acpi_listen to inspect firmware events.
 
-+ Run android stuff: "getprop ro.whatever", "pm install
-  something.apk", "am start ...".  Script activity and intent
++ Android stuff works like you expect: "getprop ro.whatever", "pm
+  install something.apk", "am start ...".  Script activity and intent
   management using robust tools.
 
-+ Attach gdb or strace to an android process.
++ Attach a local gdb to an android process.  This is tons eaiser than
+  messing with gdbserver and for simple debugging just as good (you
+  will need to copy unstripped libraries into /system/lib to get debug
+  info, and the glibc-based gdb doesn't seem to understand bionic
+  threads, so you will have to attach to the specific thread you
+  want).
 
-+ netstat, iptables
-
-+ {TODO} tcpdump
++ netstat, iptables, tcpdump, iwconfig/iwlist
 
 + {TODO} Launch a dalvik app under valgrind with "valgrind app_process ..."
 

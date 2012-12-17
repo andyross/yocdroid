@@ -84,5 +84,6 @@ IMAGE_INSTALL = " \
     util-linux \
     valgrind \
     wget \
+    yocdroid-scripts \
     zip \
 "

@@ -1,46 +1,37 @@
 BUGS:
 
++ There is no way to "stop" the environment.  The bind mounts won't
+  unmount until all the processes using them are killed.  Consider
+  placing them all in a cgroup a-la systemd...
+
++ The kernel initrd rootfs cannot be bind mounted.  So the yocdroid
+  chroot has no access to it (it's read-only and non-persistent, of
+  course, but sometimes it's nice to check what the init.rc said for
+  the current system).
+
 + The mount copies are static and don't track changes to the
   filesystem (e.g. app asec mounts, user switching.  Amusingly the
-  sdcard virtual filesystme works fine as the FUSE mount is static...)
+  sdcard virtual filesystem works fine as the FUSE mount is static...)
   automatically.  This could be handled with a small daemon listening
   on a netlink socket.
 
 + There is no integration with the Android user/group IDs.  Everything
   but root appears as a numeric ID to the linux personality.
   Amusingly, the list is statically defined (in C code!) in
-  system/core/include/private/android_filesystem_config.h.  Just cook
-  that into a /etc/passwd file.
+  system/core/include/private/android_filesystem_config.h.  This list
+  should be merged with the core IDs in the base-passwd package.
 
-+ (MAYBE FIXED) The /etc/mtab file should be a link to /proc/mounts
-  but isn't
++ The procps utilities (uptime is the most obvious to test) report a
+  warning of "Unknown HZ value! (xx) Assume 100."  Frustratingly
+  google results for this error are dominated by discussion of a few
+  rootkits which install stale procps versions which trigger the
+  warning and don't detail the actual issue.
 
-+ uptime reports "Unknown HZ value! (xx) Assume 100."
-
-+ (MAYBE FIXED) syslog doesn't work due to a filesystem namespace
-  collision.  On android "/dev/log" is a directory, not a syslog
-  socket.  This is defined in eglibc as _PATH_LOG in a header, and I
-  think that should be sufficient to fix it.
-
-+ Even so, /proc/kmsg doesn't duplicate messages, so no kernel
-  logging for syslog.  The klogd component needs to be disabled when
-  starting syslogd.
-
-+ The nosuid flag for /data is inherited by the bind mount, so suid
-  binaries won't work.  For remote access via a root shell in adb
-  that's fine, but local access from an app (e.g. Term.apk) context
-  requires a working su.
-
-+ Passwordless root login in sshd is borked somehow; you have to set a
-  password with /usr/bin/passwd or add a key.  Frankly this is
-  probably for the best.
-
-+ acpid won't start without the /etc/acpi/events directory being present
-
-+ gdb doesn't understand the android linker paths, and android
-  binaries don't use RPATH to tell it.  Use "set solib-search-path
-  /system/lib" to work around.  This should work in an /etc/gdbinit
-  file, but it didn't for me the first time I tried.
++ On a default android device, the nosuid flag for /data is inherited
+  by the bind mount, so suid binaries won't work.  For remote access
+  via a root shell that's fine that's fine, but local access from an
+  app (e.g. Term.apk) context requires a working su.  It also prevents
+  many utilities (e.g. ping) from running as non-root users.
 
 + gdb doesn't seem to understand threads.  With ps -eLf I can see
   multiple threads, but "thread 2" in the attached process gives me
@@ -48,7 +39,36 @@ BUGS:
   it relying on a pthread/nptl implementation that bionic doesn't
   do?
 
-+ /etc/profile et. al. need to add /system/{bin,xbin} to the PATH
++ (MAYBE FIXED) The /etc/mtab file should be a link to /proc/mounts
+  but isn't
 
-+ The environment pruning is too aggressive.  Some android variables
-  should be preserved...
++ (MAYBE FIXED) syslog doesn't work due to a filesystem namespace
+  collision.  On android "/dev/log" is a directory, not a syslog
+  socket.  This is defined in eglibc as _PATH_LOG in a header, and I
+  think that should be sufficient to fix it.
+
++ (MAYBE FIXED) Even so, /proc/kmsg doesn't duplicate messages, so no
+  kernel logging for syslog.  The klogd component needs to be disabled
+  when starting syslogd.
+
++ (MAYBE FIXED) acpid won't start without the /etc/acpi/events
+  directory being present
+
++ (MAYBE FIXED) gdb doesn't understand the android linker paths, and
+  android binaries don't use RPATH to tell it.  Use "set
+  solib-search-path /system/lib" to work around.  This should work in
+  an /etc/gdbinit file, but that has to be configured at build time
+  with --with-system-gdbinit
+
++ (FIXED) Not all of the /etc/rc3.d links are safe to execute, so we
+  can't start at boot.
+
++ (FIXED) There is no bootstrap procedure for root authentication.
+  Should maybe require a root password in local.conf (and error if
+  it's unset), or copy the build user's ssh public key...
+
++ (FIXED) /etc/profile et. al. need to add /system/{bin,xbin} to the PATH
+
++ (FIXED) The environment pruning is too aggressive.  Some android
+  variables should be preserved...
+
