@@ -1,0 +1,32 @@
+Dynamically detect a hopefully device-specific hostname (the build
+user + board name).  And pass --no-drop-root because the socket
+creation fails otherwise.
+
+Upstream-status: innappropriate (distro-local changes)
+
+diff --git a/initscript/debian/avahi-daemon.in b/initscript/debian/avahi-daemon.in
+index 4793b46..3366e4f 100755
+--- a/initscript/debian/avahi-daemon.in
++++ b/initscript/debian/avahi-daemon.in
+@@ -36,6 +36,12 @@
+ # Authors:      <sebastien.estienne@gmail.com>
+ #
+ 
++# Yocdroid hackery.  Set the hostname dynamically, because the Android
++# kernel hostname is simply "localhost" in all cases.
++. /etc/profile.d/yocdroid.sh
++HN=$(getprop ro.build.user)-$(getprop ro.product.board)
++perl -p -i -e "s/^#?host-name=.*/host-name=$HN/" /etc/avahi/avahi-daemon.conf
++
+ if [ -f /lib/lsb/init-functions ]
+ then
+     . /lib/lsb/init-functions
+@@ -132,7 +138,7 @@ d_start() {
+ 	cp -fp /etc/localtime @sysconfdir@/avahi/etc >/dev/null 2>&1
+     fi;
+     
+-    $DAEMON -D
++    $DAEMON --no-drop-root -D
+ }
+ 
+ #

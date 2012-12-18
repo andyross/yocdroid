@@ -22,6 +22,7 @@ IMAGE_INSTALL = " \
     alsa-utils \
     at \
     attr \
+    avahi \
     base-files \
     bash \
     bc \

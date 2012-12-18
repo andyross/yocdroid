@@ -10,8 +10,12 @@ BB_ENV_EXTRAWHITE = MACHINE DISTRO TCMODE TCLIBC http_proxy ftp_proxy	\
 
 export OEROOT PATH BB_ENV_EXTRAWHITE
 
+IMGFILE = tmp/deploy/images/yocdroid-image-qemux86.tar.bz2 
+D = /data/y
+
 image: pokycheck
 	bitbake yocdroid-image
+	ls -lL $(IMGFILE)
 
 .PHONY: bbwrap pokycheck
 
@@ -35,13 +39,12 @@ distclean:
 
 # Note that this relies on a /system/xbin/busybox/tar binary.  Would
 # be good to bootstrap from only AOSP tools...
-D = /data/y
-install: tmp/deploy/images/yocdroid-image-qemux86.tar.bz2
+install: $(IMGFILE)
 	adb shell rm -rf $(D)
 	adb shell mkdir $(D)
-	adb push tmp/deploy/images/yocdroid-image-qemux86.tar.bz2 /data/
-	adb shell 'cd $(D); /system/xbin/busybox/tar xjf /data/yocdroid-image-qemux86.tar.bz2'
-	adb shell rm /data/yocdroid-image-qemux86.tar.bz2
+	adb push $(IMGFILE) /data/imgtmp.tar.bz2
+	adb shell 'cd $(D); /system/xbin/busybox/tar xjf /data/imgtmp.tar.bz2'
+	adb shell rm /data/imgtmp.tar.bz2
 
 # Installs the current user's ssh public keys over adb to bootstrap
 # root authentication.
