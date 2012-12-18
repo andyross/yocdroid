@@ -67,6 +67,7 @@ IMAGE_INSTALL = " \
     rsync \
     screen \
     sed \
+    sshfs-fuse \
     strace \
     sysfsutils \
     sysklogd \
@@ -82,6 +83,7 @@ IMAGE_INSTALL = " \
     update-rc.d \
     usbutils \
     util-linux \
+    util-linux-blkid \
     valgrind \
     wget \
     yocdroid-scripts \

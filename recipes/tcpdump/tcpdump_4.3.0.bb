@@ -11,6 +11,7 @@ SRC_URI = "http://www.tcpdump.org/release/tcpdump-${PV}.tar.gz \
 SRC_URI[md5sum] = "a3fe4d30ac85ff5467c889ff46b7e1e8"
 SRC_URI[sha256sum] = "efd08b610210d39977ec3175fa82dad9fbd33587930081be2a905a712dba4286"
 
+DEPENDS = "libpcap"
 RDEPENDS_${PN} = "libpcap"
 
 inherit autotools
