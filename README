@@ -8,6 +8,9 @@ ability to interoperate with the core Android world.  For example:
 + bash, perl, python, ssh, nc, curl, wget.  Cron jobs!  Hook
   /etc/rc.local!  Use "file" on unknown data.
 
++ Find your device on any local network via Avahi/Zeroconf
+  ("avahi-browse -a", "ssh andy-ivb.local")
+
 + Terminals spawned from ssh instead of adb understand SIGWINCH and
   get proper settings for LINES/COLUMNS.  No more broken terminal
   output.
@@ -32,6 +35,3 @@ ability to interoperate with the core Android world.  For example:
 + {TODO} Launch a dalvik app under valgrind with "valgrind app_process ..."
 
 + {TODO} Mount the android filesystem locally via sshfs
-
-+ {TODO} Find your device on any local network via Avahi/Zeroconf
-  ("avahi-browse -a", "ssh ydroid-ivb-andy.local")

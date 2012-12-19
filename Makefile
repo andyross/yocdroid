@@ -29,7 +29,6 @@ bbwrap:
 	@echo "OEROOT=$(OEROOT)" >> $@
 	@echo "PATH=$(PATH)" >> $@
 	@echo "BB_ENV_EXTRAWHITE=\"$(BB_ENV_EXTRAWHITE)\"" >> $@
-	@echo "unset DISPLAY" >> $@
 	@echo "export OEROOT BB_ENV_EXTRAWHITE" >> $@
 	@echo 'exec bitbake "$$@"' >> $@
 	@chmod 755 $@
@@ -53,3 +52,8 @@ install-ssh:
 	adb shell mkdir $(D)/home/root/.ssh
 	adb shell chmod 700 $(D)/home/root/.ssh
 	adb push sshkeystmp $(D)/home/root/.ssh/authorized_keys
+
+start:
+	adb shell $(D)/sbin/yocdroid-start
+	adb shell $(D)/sbin/yocdroid-run /etc/init.d/rc 3
+

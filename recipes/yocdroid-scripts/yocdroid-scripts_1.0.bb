@@ -7,6 +7,7 @@ SRC_URI = "file://yocdroid-start \
            file://yocdroid-run \
            file://chroot-static.c \
            file://yocdroid.sh \
+           file://app_process \
            file://COPYING"
 
 do_configure() {
@@ -20,8 +21,10 @@ do_compile() {
 }
 
 do_install() {
+    # FIXME: why is the ../ needed?  What's the proper way to find SRC_URI components?
+    install -D -m 0755 ../app_process    ${D}${base_bindir}/app_process
     install -D -m 0755 chroot-static     ${D}${base_sbindir}/chroot-static
     install -D -m 0755 ../yocdroid-start ${D}${base_sbindir}/yocdroid-start
     install -D -m 0755 ../yocdroid-run   ${D}${base_sbindir}/yocdroid-run
-    install -D -m 0644 ../yocdroid.sh   ${D}${sysconfdir}/profile.d/yocdroid.sh
+    install -D -m 0644 ../yocdroid.sh    ${D}${sysconfdir}/profile.d/yocdroid.sh
 }

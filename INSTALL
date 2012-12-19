@@ -59,4 +59,5 @@ A very useful trick is running:
 
 ...to launch all the runlevel 3 daemons, including sshd.  The same
 commands can be added as a service in /init.rc to launch the
-environment automatically at boot.
+environment automatically at boot.  There is also a "make start"
+target which does this over adb.

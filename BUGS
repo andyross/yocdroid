@@ -1,5 +1,11 @@
 BUGS:
 
++ The installation and starup process depends on a busybox tar and
+  bzip2.  The startup process depends on various busybox utilities
+  that aren't in AOSP.  It would be nice to make these work on AOSP
+  alone.  How about copying the Yocto busybox+libc.so and running them
+  with a wrapper script?
+
 + There is no way to "stop" the environment.  The bind mounts won't
   unmount until all the processes using them are killed.  Consider
   placing them all in a cgroup a-la systemd...
@@ -38,37 +44,3 @@ BUGS:
   nothing (I can attach to the thread's tid directly, however).  Is
   it relying on a pthread/nptl implementation that bionic doesn't
   do?
-
-+ (MAYBE FIXED) The /etc/mtab file should be a link to /proc/mounts
-  but isn't
-
-+ (MAYBE FIXED) syslog doesn't work due to a filesystem namespace
-  collision.  On android "/dev/log" is a directory, not a syslog
-  socket.  This is defined in eglibc as _PATH_LOG in a header, and I
-  think that should be sufficient to fix it.
-
-+ (MAYBE FIXED) Even so, /proc/kmsg doesn't duplicate messages, so no
-  kernel logging for syslog.  The klogd component needs to be disabled
-  when starting syslogd.
-
-+ (MAYBE FIXED) acpid won't start without the /etc/acpi/events
-  directory being present
-
-+ (MAYBE FIXED) gdb doesn't understand the android linker paths, and
-  android binaries don't use RPATH to tell it.  Use "set
-  solib-search-path /system/lib" to work around.  This should work in
-  an /etc/gdbinit file, but that has to be configured at build time
-  with --with-system-gdbinit
-
-+ (FIXED) Not all of the /etc/rc3.d links are safe to execute, so we
-  can't start at boot.
-
-+ (FIXED) There is no bootstrap procedure for root authentication.
-  Should maybe require a root password in local.conf (and error if
-  it's unset), or copy the build user's ssh public key...
-
-+ (FIXED) /etc/profile et. al. need to add /system/{bin,xbin} to the PATH
-
-+ (FIXED) The environment pruning is too aggressive.  Some android
-  variables should be preserved...
-
