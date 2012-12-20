@@ -10,14 +10,15 @@ SRC_URI = "file://yocdroid-start \
            file://app_process \
            file://COPYING"
 
-do_configure() {
+do_unpack[postfuncs] += "finish_unpack"
+finish_unpack() {
     # Needed to get the license file check to work.  Not sure what the
     # right thing to do is with a license in local files...
     cp ../COPYING .
 }
 
 do_compile() {
-    ${CC} -Os -static -o chroot-static ../chroot-static.c
+    ${CC} -o chroot-static ../chroot-static.c -nostdlib -lgcc
 }
 
 do_install() {
