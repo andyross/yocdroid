@@ -1,0 +1,88 @@
+diff --git a/nc.1 b/nc.1
+index 75d1437..e1dec7f 100644
+--- a/nc.1
++++ b/nc.1
+@@ -34,7 +34,7 @@
+ .Sh SYNOPSIS
+ .Nm nc
+ .Bk -words
+-.Op Fl 46DdhklnrStUuvz
++.Op Fl 46CDdhklnrStUuvz
+ .Op Fl I Ar length
+ .Op Fl i Ar interval
+ .Op Fl O Ar length
+@@ -98,6 +98,8 @@ to use IPv4 addresses only.
+ Forces
+ .Nm
+ to use IPv6 addresses only.
++.It Fl C
++Send CRLF as line-ending.
+ .It Fl D
+ Enable debugging on the socket.
+ .It Fl d
+diff --git a/netcat.c b/netcat.c
+index 792112f..f58298f 100644
+--- a/netcat.c
++++ b/netcat.c
+@@ -86,6 +86,7 @@ int	Iflag;					/* TCP receive buffer size */
+ int	Oflag;					/* TCP send buffer size */
+ int	Sflag;					/* TCP MD5 signature option */
+ int	Tflag = -1;				/* IP Type of Service */
++int	Cflag = 0;				/* CRLF line-ending */
+ 
+ int timeout = -1;
+ int family = AF_UNSPEC;
+@@ -131,7 +132,7 @@ main(int argc, char *argv[])
+ 	sv = NULL;
+ 
+ 	while ((ch = getopt(argc, argv,
+-	    "46DdhI:i:klnO:P:p:rSs:tT:Uuvw:X:x:z")) != -1) {
++	    "46CDdhI:i:klnO:P:p:rSs:tT:Uuvw:X:x:z")) != -1) {
+ 		switch (ch) {
+ 		case '4':
+ 			family = AF_INET;
+@@ -239,6 +240,9 @@ main(int argc, char *argv[])
+ 			if (Tflag < 0 || Tflag > 255 || errstr || errno)
+ 				errx(1, "illegal tos value %s", optarg);
+ 			break;
++		case 'C':
++			Cflag = 1;
++			break;
+ 		default:
+ 			usage(1);
+ 		}
+@@ -747,8 +751,15 @@ readwrite(int nfd)
+ 				else if (n == 0) {
+ 					goto shutdown_wr;
+ 				} else {
+-					if (atomicio(vwrite, nfd, buf, n) != n)
+-						return;
++					if (Cflag && (buf[n-1] == '\n')) {
++						buf[n-1] = '\r';
++						buf[n]   = '\n';
++						if (atomicio(vwrite, nfd, buf, n+1) != n+1)
++							return;
++					} else {
++						if (atomicio(vwrite, nfd, buf, n) != n)
++							return;
++					}
+ 				}
+ 			}
+ 			else if (pfd[1].revents & POLLHUP) {
+@@ -980,6 +991,7 @@ help(void)
+ 	\t-S		Enable the TCP MD5 signature option\n\
+ 	\t-s addr\t	Local source address\n\
+ 	\t-T toskeyword\tSet IP Type of Service\n\
++	\t-C		Send CRLF as line-ending\n\
+ 	\t-t		Answer TELNET negotiation\n\
+ 	\t-U		Use UNIX domain socket\n\
+ 	\t-u		UDP mode\n\
+@@ -997,7 +1009,7 @@ void
+ usage(int ret)
+ {
+ 	fprintf(stderr,
+-	    "usage: nc [-46DdhklnrStUuvz] [-I length] [-i interval] [-O length]\n"
++	    "usage: nc [-46CDdhklnrStUuvz] [-I length] [-i interval] [-O length]\n"
+ 	    "\t  [-P proxy_username] [-p source_port] [-s source] [-T ToS]\n"
+ 	    "\t  [-V rtable] [-w timeout] [-X proxy_protocol]\n"
+ 	    "\t  [-x proxy_address[:port]] [destination] [port]\n");

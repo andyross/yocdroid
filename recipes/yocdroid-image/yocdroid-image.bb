@@ -51,6 +51,7 @@ IMAGE_INSTALL = " \
     man-pages \
     mingetty \
     mktemp \
+    nc \
     ncurses \
     net-tools \
     openssh \
