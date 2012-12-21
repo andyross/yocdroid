@@ -1,1 +1,5 @@
 set solib-search-path /system/lib
+
+add-auto-load-safe-path /usr/lib/android
+set libthread-db-search-path /usr/lib/android
+set auto-load libthread-db

@@ -1,0 +1,10 @@
+The gdb_thread_db.h file is GNU software distributed as part of gdb
+under the GPLv3.  The original libthread_db.c file is AOSP software
+distributed in AOSP under BSD terms.
+
+Whether the modifications required to port the latter to the former,
+and the resulting work, constitute "derived works" of GNU gdb is for
+someone else to say.  Note that the glibc libthread_db.so.1
+implentation, using the same interface, is distributed under the
+LGPLv3.
+
