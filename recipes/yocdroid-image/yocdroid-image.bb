@@ -46,6 +46,7 @@ IMAGE_INSTALL = " \
     iproute2 \
     iptables \
     iputils \
+    ldd \
     less \
     libacpi \
     man-pages \
