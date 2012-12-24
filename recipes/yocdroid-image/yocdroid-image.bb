@@ -18,11 +18,11 @@ IMAGE_FSTYPES = "tar.bz2"
 # assumption we're building a true distro.  List packages explicitly.
 IMAGE_INSTALL = " \
     acl \
-    acpid \
     alsa-utils \
     at \
     attr \
     avahi \
+    avahi-utils \
     base-files \
     bash \
     bc \
@@ -48,7 +48,6 @@ IMAGE_INSTALL = " \
     iputils \
     ldd \
     less \
-    libacpi \
     man-pages \
     mingetty \
     mktemp \
@@ -58,7 +57,6 @@ IMAGE_INSTALL = " \
     openssh \
     openssl \
     parted \
-    pciutils \
     perl \
     perl-misc \
     perl-modules \
@@ -87,8 +85,14 @@ IMAGE_INSTALL = " \
     usbutils \
     util-linux \
     util-linux-blkid \
-    valgrind \
     wget \
+    wireless-tools \
     yocdroid-scripts \
     zip \
+"
+
+IMAGE_INSTALL_append_x86 = " \
+    acpid \
+    libacpi \
+    pciutils \
 "
