@@ -10,6 +10,7 @@ SRC_URI = "http://downloads.sourceforge.net/project/fuse/${PN}/${PV}/${PN}-${PV}
 SRC_URI[md5sum] = "3c7c3647c52ce84d09486f1da3a3ce24"
 SRC_URI[sha256sum] = "3c93ba8522568093c94ff9c5a3763929380dd229365d905769ff82475d774dd1"
 
+DEPENDS = "fuse glib-2.0"
 RDEPENDS_${PN} = "openssh-ssh"
 
 inherit autotools
