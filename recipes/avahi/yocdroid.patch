@@ -13,9 +13,9 @@ index 4793b46..3366e4f 100755
  #
  
 +# Yocdroid hackery.  Set the hostname dynamically, because the Android
-+# kernel hostname is simply "localhost" in all cases.
++# kernel hostname is simply "localhost" in all cases (sanify for DNS).
 +. /etc/profile.d/yocdroid.sh
-+HN=$(getprop ro.build.user)-$(getprop ro.product.board)
++HN=$(echo -n $(getprop net.hostname) | tr -c 'a-zA-Z0-9-' '-')
 +perl -p -i -e "s/^#?host-name=.*/host-name=$HN/" /etc/avahi/avahi-daemon.conf
 +
  if [ -f /lib/lsb/init-functions ]
