@@ -10,6 +10,9 @@ SRC_URI = "file://yocdroid-start \
            file://app_process \
            file://COPYING"
 
+# Needed because the strip/objcopy step breaks chroot-static somehow...
+INHIBIT_PACKAGE_DEBUG_SPLIT = "1"
+
 do_unpack[postfuncs] += "finish_unpack"
 finish_unpack() {
     # Needed to get the license file check to work.  Not sure what the

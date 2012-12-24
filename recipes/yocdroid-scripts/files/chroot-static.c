@@ -61,7 +61,8 @@ long syscall1(long num, long arg1)
         "swi $0\n\t"
         "mov r0, %0"
         : "=r"(result)
-        : "r"(num), "r"(arg1));
+        : "r"(num), "r"(arg1)
+        : "r0", "r7");
     return result;
 }
 
@@ -75,7 +76,8 @@ long syscall3(long num, long arg1, long arg2, long arg3)
         "swi $0\n\t"
         "mov r0, %0"
         : "=r"(result)
-        : "r"(num), "r"(arg1), "r"(arg2), "r"(arg3));
+        : "r"(num), "r"(arg1), "r"(arg2), "r"(arg3)
+        : "r0", "r1", "r2", "r7");
     return result;
 }
 
