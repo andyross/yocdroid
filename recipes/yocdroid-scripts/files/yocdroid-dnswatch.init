@@ -1,0 +1,35 @@
+#!/bin/sh
+### BEGIN INIT INFO
+# Provides:          yocdroid-dnswatch
+# Default-Start:     3 4 5
+# Default-Stop:      0 1 2 6
+# Short-Description: Yocdroid resolv.conf daemon
+# Description:       Maintains /etc/resolv.conf to match Android runtime
+### END INIT INFO
+
+D=yocdroid-dnswatch
+SSD="start-stop-daemon --pidfile /var/run/$D.pid"
+BIN=/usr/sbin/$D
+
+case "$1" in
+    start)
+
+	$SSD --start --exec $BIN
+     	;;
+    stop)
+	$SSD --stop $BIN
+	;;
+    restart)
+	$SSD --stop $BIN && $SSD --start --exec $BIN
+	;;
+    status)
+	if $SSD --quiet --stop --test $BIN 2>/dev/null; then
+	    echo "$D is running"
+	else
+	    echo "$D is stopped"
+	fi
+     ;;
+     *)
+     echo "Usage: $D {start|stop|restart|status}" >&2
+     exit 1
+esac

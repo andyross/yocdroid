@@ -5,19 +5,25 @@ PR = "r1"
 
 SRC_URI = "file://yocdroid-start \
            file://yocdroid-run \
+           file://yocdroid-dnswatch \
+           file://yocdroid-dnswatch.init \
            file://chroot-static.c \
            file://yocdroid.sh \
-           file://app_process \
-           file://COPYING"
+           file://app_process"
+
+LICENSE_FILE := "${THISDIR}/COPYING"
 
 # Needed because the strip/objcopy step breaks chroot-static somehow...
 INHIBIT_PACKAGE_DEBUG_SPLIT = "1"
+
+inherit update-rc.d
+INITSCRIPT_NAME = "yocdroid-dnswatch"
 
 do_unpack[postfuncs] += "finish_unpack"
 finish_unpack() {
     # Needed to get the license file check to work.  Not sure what the
     # right thing to do is with a license in local files...
-    cp ../COPYING .
+    cp ${LICENSE_FILE} .
 }
 
 do_compile() {
@@ -31,4 +37,6 @@ do_install() {
     install -D -m 0755 ../yocdroid-start ${D}${base_sbindir}/yocdroid-start
     install -D -m 0755 ../yocdroid-run   ${D}${base_sbindir}/yocdroid-run
     install -D -m 0644 ../yocdroid.sh    ${D}${sysconfdir}/profile.d/yocdroid.sh
+    install -D -m 0755 ../yocdroid-dnswatch      ${D}${sbindir}/yocdroid-dnswatch
+    install -D -m 0755 ../yocdroid-dnswatch.init ${D}${sysconfdir}/init.d/yocdroid-dnswatch
 }
