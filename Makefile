@@ -1,4 +1,10 @@
+# Choose a Yocto machine here.  The "qemuarm" is a armv5te softfp
+# target which will work on all ARM Android devices, while qemux86
+# will produce generic -march=i586 binaries.  There is a "qemux86-64"
+# machine as well, if you have a suitable kernel on your device.
+MACHINE = qemuarm
 
+# Bitbake environment
 OEROOT := $(shell pwd)/poky
 PATH := $(OEROOT)/scripts:$(OEROOT)/bitbake/bin:$(PATH)
 BB_ENV_EXTRAWHITE = MACHINE DISTRO TCMODE TCLIBC http_proxy ftp_proxy	\
@@ -7,17 +13,16 @@ BB_ENV_EXTRAWHITE = MACHINE DISTRO TCMODE TCLIBC http_proxy ftp_proxy	\
                     SDKMACHINE BB_NUMBER_THREADS BB_NO_NETWORK		\
                     PARALLEL_MAKE GIT_PROXY_COMMAND GIT_PROXY_IGNORE	\
                     SOCKS5_PASSWD SOCKS5_USER SCREENDIR
+export OEROOT MACHINE PATH BB_ENV_EXTRAWHITE
 
-export OEROOT PATH BB_ENV_EXTRAWHITE
-
-IMGFILE = tmp/deploy/images/yocdroid-image-qemux86.tar.bz2 
+IMGFILE = tmp/deploy/images/yocdroid-image-$(MACHINE).tar.bz2 
 D = /data/y
 
 image: pokycheck
 	bitbake yocdroid-image
 	ls -lL $(IMGFILE)
 
-.PHONY: bbwrap pokycheck
+.PHONY: bbwrap pokycheck distclean image install install-ssh
 
 pokycheck: bbwrap
 	@test -f poky/meta/conf/layer.conf || { \
@@ -26,6 +31,7 @@ pokycheck: bbwrap
 
 bbwrap:
 	@echo "#!/bin/sh" > $@
+	@echo 'test -z "$$MACHINE" && MACHINE=$(MACHINE)' >> $@
 	@echo "OEROOT=$(OEROOT)" >> $@
 	@echo "PATH=$(PATH)" >> $@
 	@echo "BB_ENV_EXTRAWHITE=\"$(BB_ENV_EXTRAWHITE)\"" >> $@
@@ -36,24 +42,33 @@ bbwrap:
 distclean:
 	rm -rf sstate-cache tmp bbwrap bitbake.lock pseudodone
 
-# Note that this relies on a /system/xbin/busybox/tar binary.  Would
-# be good to bootstrap from only AOSP tools...
-install: $(IMGFILE)
-	adb shell rm -rf $(D)
-	adb shell mkdir $(D)
-	adb push $(IMGFILE) /data/imgtmp.tar.bz2
-	adb shell 'cd $(D); /system/xbin/busybox/tar xjf /data/imgtmp.tar.bz2'
-	adb shell rm /data/imgtmp.tar.bz2
+# The su binary is incompatible between distros, use a wrapper.
+SU = /system/bin/sh /sdcard/suwrap
+suwrap:
+	adb push bootstrap/suwrap /sdcard/suwrap
+
+# Note that this relies on a busybox tar (with a find under xbin to
+# handle variant locations).  Would be good to bootstrap from only
+# AOSP tools...
+install: $(IMGFILE) suwrap
+	adb shell $(SU) 'mkdir $(D)'
+	adb push $(IMGFILE) /sdcard/imgtmp.tar.bz2
+	adb shell $(SU) 'cd $(D); `find /system/xbin -type f -name busybox` tar xjf /sdcard/imgtmp.tar.bz2'
+	adb shell $(SU) 'rm /sdcard/imgtmp.tar.bz2'
 
 # Installs the current user's ssh public keys over adb to bootstrap
 # root authentication.
-install-ssh:
+install-ssh: suwrap
 	cat ~/.ssh/id*.pub > sshkeystmp
-	adb shell mkdir $(D)/home/root/.ssh
-	adb shell chmod 700 $(D)/home/root/.ssh
-	adb push sshkeystmp $(D)/home/root/.ssh/authorized_keys
+	adb shell $(SU) 'mkdir $(D)/home/root/.ssh'
+	adb shell $(SU) 'chmod 700 $(D)/home/root/.ssh'
+	adb push sshkeystmp /sdcard/
+	adb shell $(SU) 'cp /sdcard/sshkeystmp $(D)/home/root/.ssh/authorized_keys'
+	adb shell $(SU) 'chmod 644 $(D)/home/root/.ssh/authorized_keys'
+	adb shell $(SU) 'rm /sdcard/sshkeystmp'
+	rm -f sshkeystmp
 
-start:
-	adb shell $(D)/sbin/yocdroid-start
-	adb shell $(D)/sbin/yocdroid-run /etc/init.d/rc 3
+start: suwrap
+	adb shell $(SU) '$(D)/sbin/yocdroid-start'
+	adb shell $(SU) '$(D)/sbin/yocdroid-run /etc/init.d/rc 3'
 

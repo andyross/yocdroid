@@ -5,7 +5,7 @@ With it, you can have a (more or less) fully integratied "real" Linux
 command line environment on your Android machine without losing the
 ability to interoperate with the core Android world.  For example:
 
-+ bash, perl, python, ssh, nc, curl, wget.  Cron jobs!  Hook
++ bash, perl, python, ssh, curl, wget.  Cron jobs!  Hook
   /etc/rc.local!  Use "file" on unknown data.
 
 + Find your device on any local network via Avahi/Zeroconf
@@ -25,13 +25,11 @@ ability to interoperate with the core Android world.  For example:
 
 + Attach a local gdb to an android process.  This is tons eaiser than
   messing with gdbserver and for simple debugging just as good (you
-  will need to copy unstripped libraries into /system/lib to get debug
-  info, and the glibc-based gdb doesn't seem to understand bionic
-  threads, so you will have to attach to the specific thread you
-  want).
+  will need to have unstripped libraries in /system/lib to get source
+  info in the backtrace, of course).  It even works with Bionic
+  pthreads!
 
-+ netstat, iptables, tcpdump, iwconfig/iwlist
++ netstat, iptables, tcpdump, iwconfig/iwlist (for compatible hardware)
 
-+ {TODO} Launch a dalvik app under valgrind with "valgrind app_process ..."
-
-+ {TODO} Mount the android filesystem locally via sshfs
++ Mount the android filesystem locally via sshfs.  Mount remote
+  filesystems on the Android box over sshfs.

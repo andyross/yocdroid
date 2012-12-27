@@ -1,0 +1,24 @@
++ Bootstrap installation which requires just root access for a single
+  toolbox-based script.
+
++ Add a cgroups-based "stop" utility to reliably shutdown the
+  yocdroid environment and remove all the bind mounts.
+
++ netlink solution to detect mount/umount events and maintain the bind
+  mounts dynamically
+
++ Come up with a recipe for running dalvik UI apps
+
++ dmidecode recipe
+
++ Figure out valgrind's error with /system/bin/linker.  Apparently
+  this should work per the valgrind site.
+
++ Make non-arch links for the binutils binaries so the user can do
+  e.g. "readelf" on the target.
+
++ Put the root in a tmpfs, bind mounting /data/y such that it can be
+  remounted suid.
+
++ Fix "make install" to work with both AOSP (weird) and Cyanogenmod
+  (more typical) "su" binaries.

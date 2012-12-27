@@ -1,5 +1,11 @@
 BUGS:
 
++ No meaningful effort has been made to secure the installation.
+  There are no known holes (it lives in /data, which is not writable
+  to apps), but for the moment it's safest to assume that a clever
+  downloaded app will be able to bootstrap local root access if
+  yocdroid is installed.
+
 + The installation and starup process depends on a busybox tar and
   bzip2.  The startup process depends on various busybox utilities
   that aren't in AOSP.  It would be nice to make these work on AOSP
@@ -13,13 +19,17 @@ BUGS:
 + The kernel initrd rootfs cannot be bind mounted.  So the yocdroid
   chroot has no access to it (it's read-only and non-persistent, of
   course, but sometimes it's nice to check what the init.rc said for
-  the current system).
+  the current system).  Maybe make copies of the files in root and
+  bind mount subdirectories?
 
-+ The mount copies are static and don't track changes to the
-  filesystem (e.g. app asec mounts, user switching.  Amusingly the
-  sdcard virtual filesystem works fine as the FUSE mount is static...)
-  automatically.  This could be handled with a small daemon listening
-  on a netlink socket.
++ The bind mount environment is static and doesn't track changes to
+  the filesystem (e.g. app asec mounts) automatically.  This could be
+  handled with a small daemon listening on a netlink socket.
+
++ The recursive bind mount (/data/y/data is a mount of /data -- it
+  lives inside itself) seems to trigger a kernel bug where mounting
+  inside /data produces two copies of the mount, one in the expected
+  place and another under /data/y.
 
 + There is no integration with the Android user/group IDs.  Everything
   but root appears as a numeric ID to the linux personality.
@@ -38,9 +48,3 @@ BUGS:
   via a root shell that's fine that's fine, but local access from an
   app (e.g. Term.apk) context requires a working su.  It also prevents
   many utilities (e.g. ping) from running as non-root users.
-
-+ gdb doesn't seem to understand threads.  With ps -eLf I can see
-  multiple threads, but "thread 2" in the attached process gives me
-  nothing (I can attach to the thread's tid directly, however).  Is
-  it relying on a pthread/nptl implementation that bionic doesn't
-  do?

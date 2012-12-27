@@ -6,9 +6,13 @@ works fine) as "./poky".  You can get this from the upstream git with:
 
     git clone git://git.yoctoproject.org/poky
 
-Building an x86 image is as simple as "make".  The output tarball will
+Building an image is as simple as "make".  The output tarball will
 appear in tmp/deploy/images.  Simply unpack this under /data/y on your
-Android device.
+Android device.  The target architecture can be specified by passing a
+MACHINE variable to make.  Choices currently supported are "qemuarm"
+and "qemux86" (the default), e.g.:
+
+    make MACHINE=qemuarm
 
 The build will automatically download original source tarballs for all
 the installed software (typically from high performance mirrors run by
@@ -23,14 +27,21 @@ sensitive to a correct build environment and working directory), the
 Makefile will create a "bbwrap" wrapper script for you ("make bbwrap")
 which sets up the environment correctly and then launches bitbake with
 the supplied arguments.  So e.g. "./bbwrap -c devshell
-my-package-name" does what you want.
+my-package-name" does what you want.  The wrapper script will default
+to the same MACHINE argument that make was invoked with, but this can
+be overriden in the environment:
+
+    MACHINE=qemuarm ./bbwrap [...]
 
 You may edit the installed package list directly in
-recipes/yocdroid-image/yocdroid-image.bb or with an
-"IMAGE_INSTALL_append += ..." setting in conf/local.conf.  The
-IMAGE_FEATURES mechanism from Yocto works as well, but be careful with
-it because many of the existing default package lists tend to pull in
-unwanted dependencies.
+recipes/yocdroid-image/yocdroid-image.bb or with an IMAGE_INSTALL
+setting in conf/local.conf:
+
+    IMAGE_INSTALL_append = "package1 package2 ..."
+
+The IMAGE_FEATURES mechanism from Yocto works as well, but be careful
+with it because many of the existing default package lists tend to
+pull in unwanted dependencies.
 
 Installing
 ==========
@@ -57,7 +68,7 @@ A very useful trick is running:
     adb shell /data/y/sbin/yocdroid-start
     adb shell /data/y/sbin/yocdroid-run /etc/init.d/rc 3
 
-...to launch all the runlevel 3 daemons, including sshd.  The same
+...to launch all the runlevel 3 daemons, including sshd.  There is a
+"make start" convenience target which does exactly this.  The same
 commands can be added as a service in /init.rc to launch the
-environment automatically at boot.  There is also a "make start"
-target which does this over adb.
+environment automatically at boot.
