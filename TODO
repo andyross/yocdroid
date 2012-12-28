@@ -22,3 +22,6 @@
 
 + Fix "make install" to work with both AOSP (weird) and Cyanogenmod
   (more typical) "su" binaries.
+
++ Android userid unification.  Add a /home/shell while at it and
+  integrate with the install-ssh step.
