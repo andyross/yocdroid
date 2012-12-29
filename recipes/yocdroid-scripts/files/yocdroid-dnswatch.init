@@ -11,6 +11,9 @@ D=yocdroid-dnswatch
 SSD="start-stop-daemon --pidfile /var/run/$D.pid"
 BIN=/usr/sbin/$D
 
+# Needed to set up a working watchprops
+. /etc/profile.d/yocdroid.sh
+
 case "$1" in
     start)
 
