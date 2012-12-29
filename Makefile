@@ -42,33 +42,34 @@ bbwrap:
 distclean:
 	rm -rf sstate-cache tmp bbwrap bitbake.lock pseudodone
 
-# The su binary is incompatible between distros, use a wrapper.
+BUSYBOX = /system/bin/sh /sdcard/busywrap
 SU = /system/bin/sh /sdcard/suwrap
-suwrap:
+wrappers:
+	adb push bootstrap/busywrap /sdcard/busywrap
 	adb push bootstrap/suwrap /sdcard/suwrap
 
 # Note that this relies on a busybox tar (with a find under xbin to
 # handle variant locations).  Would be good to bootstrap from only
 # AOSP tools...
-install: $(IMGFILE) suwrap
-	adb shell $(SU) 'mkdir $(D)'
+install: $(IMGFILE) wrappers
+	adb shell $(SU) mkdir $(D)
 	adb push $(IMGFILE) /sdcard/imgtmp.tar.bz2
-	adb shell $(SU) 'cd $(D); `find /system/xbin -type f -name busybox` tar xjf /sdcard/imgtmp.tar.bz2'
-	adb shell $(SU) 'rm /sdcard/imgtmp.tar.bz2'
+	adb shell $(SU) $(BUSYBOX) tar -x -j -C $(D) -f /sdcard/imgtmp.tar.bz2 
+	adb shell $(SU) rm /sdcard/imgtmp.tar.bz2
 
 # Installs the current user's ssh public keys over adb to bootstrap
 # root authentication.
-install-ssh: suwrap
+install-ssh: wrappers
 	cat ~/.ssh/id*.pub > sshkeystmp
-	adb shell $(SU) 'mkdir $(D)/home/root/.ssh'
-	adb shell $(SU) 'chmod 700 $(D)/home/root/.ssh'
+	adb shell $(SU) mkdir $(D)/home/root/.ssh
+	adb shell $(SU) chmod 700 $(D)/home/root/.ssh
 	adb push sshkeystmp /sdcard/
-	adb shell $(SU) 'cp /sdcard/sshkeystmp $(D)/home/root/.ssh/authorized_keys'
-	adb shell $(SU) 'chmod 644 $(D)/home/root/.ssh/authorized_keys'
-	adb shell $(SU) 'rm /sdcard/sshkeystmp'
+	adb shell $(SU) cp /sdcard/sshkeystmp $(D)/home/root/.ssh/authorized_keys
+	adb shell $(SU) chmod 644 $(D)/home/root/.ssh/authorized_keys
+	adb shell $(SU) rm /sdcard/sshkeystmp
 	rm -f sshkeystmp
 
-start: suwrap
-	adb shell $(SU) '$(D)/sbin/yocdroid-start'
-	adb shell $(SU) '$(D)/sbin/yocdroid-run /etc/init.d/rc 3'
+start: wrappers
+	adb shell $(SU) $(D)/sbin/yocdroid-start
+	adb shell $(SU) $(D)/sbin/yocdroid-run /etc/init.d/rc 3
 

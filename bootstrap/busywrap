@@ -1,0 +1,17 @@
+#!/system/bin/sh
+
+# Yocdroid install-time busybox wrapper.  Supports multiple install locations.
+
+for d in /system/bin /system/xbin /system/xbin/busybox; do
+    if [ -f "$d/busybox" -a -x "$d/busybox" ]; then
+	BB=$d/busybox
+    fi
+done
+
+if [ ! -x "$BB" ]; then
+    echo "Cannot find busybox" 2>&1
+    exit 1
+fi
+
+exec $BB "$@"
+

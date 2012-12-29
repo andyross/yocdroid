@@ -4,24 +4,28 @@
 # incompatible "su" variants.
 
 # First find it.  Don't trust PATH.
-SU=/system/xbin/su
-for d in `echo $PATH | sed 's/:/ /g'` /sbin /vendor/bin /system/sbin /system/bin; do
+for d in /sbin /vendor/bin /system/sbin /system/bin /system/xbin; do
     if [ -x "$d/su" ]; then
 	SU=$d/su
     fi
 done
 
-if [ -x "$d/su" ]; then
+if [ ! -x "$SU" ]; then
     echo Cannot find a working su >&2
+    exit 1
 fi
 
 if grep -q 'com\.noshufou\.android\.su' $SU; then
    # This su, which works with the Superuser.apk tool, is distributed
    # with Cyanogenmod (and may others), is popular in the "mod"
-   # community, and supports a traditional Unix su syntax.
-   exec $SU -c "$@"
+   # community, and supports a traditional Unix su syntax where the
+   # "-c" argument must (!) be a single string which is then parsed by
+   # a subshell.
+   exec $SU -c "$*"
 else
    # Google's AOSP su is non-standard, but installed by default on
-   # "real" development images.
-   exec $SU "$@"
+   # "real" development images.  It's -c syntax marks the beginning of
+   # *pre-parsed* arguments, the first of which must (!) be an
+   # executable file path to exec.
+   exec $SU -c "$@"
 fi
