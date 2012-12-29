@@ -48,6 +48,7 @@ IMAGE_INSTALL = " \
     iputils \
     ldd \
     less \
+    lvm2-dm \
     man-pages \
     mingetty \
     mktemp \
