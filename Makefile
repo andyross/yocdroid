@@ -2,7 +2,12 @@
 # target which will work on all ARM Android devices, while qemux86
 # will produce generic -march=i586 binaries.  There is a "qemux86-64"
 # machine as well, if you have a suitable kernel on your device.
-MACHINE = qemuarm
+#
+# Note that Yocto allows a single build tree to span multiple
+# architectures.  The last MACHINE choice is cached in ./machine.mak
+# to prevent accidents like installing the wrong architecture.
+-include machine.mak
+MACHINE ?= qemuarm
 
 # Bitbake environment
 OEROOT := $(shell pwd)/poky
@@ -22,7 +27,7 @@ image: pokycheck
 	bitbake yocdroid-image
 	ls -lL $(IMGFILE)
 
-.PHONY: bbwrap pokycheck distclean image install install-ssh
+.PHONY: bbwrap pokycheck distclean image install install-ssh machine.mak
 
 pokycheck: bbwrap
 	@test -f poky/meta/conf/layer.conf || { \
@@ -73,3 +78,6 @@ start: wrappers
 	adb shell $(SU) $(D)/sbin/yocdroid-start
 	adb shell $(SU) $(D)/sbin/yocdroid-run /etc/init.d/rc 3
 
+machine.mak:
+	@echo '# Auto-generated machine choice from last build' > $@
+	@echo MACHINE=$(MACHINE) >> $@
