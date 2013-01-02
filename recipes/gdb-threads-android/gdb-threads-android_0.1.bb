@@ -13,11 +13,12 @@ SRC_URI = "file://libthread_db.c \
 
 inherit local-license
 
-# The automatic -dbg package generation only works the the default
-# directories, here we need to put the contents of the .debug
-# directory into the -dbg package explicitly.
+# The automatic -dbg package generation only works for the default
+# build directory layout, here we need to put the contents of the
+# .debug directory and the source files into the -dbg package
+# explicitly.
 FILES_${PN} = "${libdir}/android ${libdir}/android/libpthread_db.so.1"
-FILES_${PN}-dbg = "${libdir}/android/.debug/*"
+FILES_${PN}-dbg = "${libdir}/android/.debug /usr/src/debug/${PN}"
 
 do_compile() {
     ${CC} ${CFLAGS} ${LDFLAGS} -I.. -shared -fPIC -Wl,-soname,libthread_db.so.1 -o libthread_db.so.1 ../libthread_db.c

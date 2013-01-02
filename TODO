@@ -20,8 +20,7 @@
 + Put the root in a tmpfs, bind mounting /data/y such that it can be
   remounted suid.
 
-+ Fix "make install" to work with both AOSP (weird) and Cyanogenmod
-  (more typical) "su" binaries.
-
 + Android userid unification.  Add a /home/shell while at it and
-  integrate with the install-ssh step.
+  integrate with the install-ssh step.  One way to do this is directly
+  manipulating the passwd/group files, but investigate the glibc nss
+  interface for a slicker solution.

@@ -48,3 +48,10 @@ BUGS:
   via a root shell that's fine that's fine, but local access from an
   app (e.g. Term.apk) context requires a working su.  It also prevents
   many utilities (e.g. ping) from running as non-root users.
+
+Minor:
+
++ AOSP "su" appears not to propagate failed result codes to the parent
+  process, so the installer is fragile on those systems -- everything
+  seems to work.
+

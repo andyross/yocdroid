@@ -16,7 +16,6 @@ BIN=/usr/sbin/$D
 
 case "$1" in
     start)
-
 	$SSD --start --exec $BIN
      	;;
     stop)
