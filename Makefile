@@ -1,13 +1,16 @@
-# Choose a Yocto machine here.  The "qemuarm" is a armv5te softfp
-# target which will work on all ARM Android devices, while qemux86
-# will produce generic -march=i586 binaries.  There is a "qemux86-64"
-# machine as well, if you have a suitable kernel on your device.
+# Choose a Yocto architecture with the MACHINE variable.  Choices
+# supported are:
+#
+# yd-arm    - ARMv6 code for older (e.g. ARM11) machines
+# yd-armv7  - ARMv7-A code for newer (ARM Cortex, Krait) devices
+# yd-x86    - 32 bit i586 code
+# yd-x86-64 - 64 bit x86_64, use only if you have a suitable kernel!
 #
 # Note that Yocto allows a single build tree to span multiple
 # architectures.  The last MACHINE choice is cached in ./machine.mak
 # to prevent accidents like installing the wrong architecture.
 -include machine.mak
-MACHINE ?= qemuarm
+MACHINE ?= yd-arm
 
 # Bitbake environment
 OEROOT := $(shell pwd)/poky
@@ -20,7 +23,7 @@ BB_ENV_EXTRAWHITE = MACHINE DISTRO TCMODE TCLIBC http_proxy ftp_proxy	\
                     SOCKS5_PASSWD SOCKS5_USER SCREENDIR
 export OEROOT MACHINE PATH BB_ENV_EXTRAWHITE
 
-IMGFILE = tmp/deploy/images/yocdroid-image-$(MACHINE).tar.bz2 
+IMGFILE = tmp/deploy/images/yocdroid-image-$(MACHINE).tar.bz2
 D = /data/y
 
 image: pokycheck
@@ -45,7 +48,7 @@ bbwrap:
 	@chmod 755 $@
 
 distclean:
-	rm -rf sstate-cache tmp bbwrap bitbake.lock pseudodone
+	rm -rf sstate-cache tmp bbwrap bitbake.lock pseudodone machine.mak conf/sanity_info
 
 BUSYBOX = /system/bin/sh /sdcard/busywrap
 SU = /system/bin/sh /sdcard/suwrap

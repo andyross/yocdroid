@@ -9,10 +9,11 @@ works fine) as "./poky".  You can get this from the upstream git with:
 Building an image is as simple as "make".  The output tarball will
 appear in tmp/deploy/images.  Simply unpack this under /data/y on your
 Android device.  The target architecture can be specified by passing a
-MACHINE variable to make.  Choices currently supported are "qemuarm"
-and "qemux86" (the default), e.g.:
+MACHINE variable to make.  Choices currently supported are "yd-arm"
+(most compatible, and default), "yd-armv7" (for modern devices) and
+"yd-x86" (for IA32 machines), e.g.:
 
-    make MACHINE=qemuarm
+    make MACHINE=yd-arm
 
 The build will automatically download original source tarballs for all
 the installed software (typically from high performance mirrors run by
@@ -31,7 +32,7 @@ my-package-name" does what you want.  The wrapper script will default
 to the same MACHINE argument that make was invoked with, but this can
 be overriden in the environment:
 
-    MACHINE=qemuarm ./bbwrap [...]
+    MACHINE=yd-armv7 ./bbwrap [...]
 
 You may edit the installed package list directly in
 recipes/yocdroid-image/yocdroid-image.bb or with an IMAGE_INSTALL
@@ -49,12 +50,15 @@ Installing
 The result tarball expects to be unpacked under /data/y on the target.
 There is a "make install" target currently that does this
 automatically over adb to the default connected device, though it
-depends on a /system/xbin/busybox/tar.
+depends on finding an installed busybox (for tar/bzip2).
 
 Optionally, there is a "make install-ssh" target available to
 bootstrap ssh authentication over adb using the current user's public
 keys.  By default, all accounts have no password and sshd will not
 allow access.
+
+Running
+=======
 
 Once installed, at a root shell root on the device, run
 "/data/y/sbin/yocdroid-start" to initialize the chroot environment.

@@ -1,0 +1,6 @@
+Openembedded/Yocto images do not really have a clean notion of an
+"architecture" as distinct from a "machine" (rather: they do, but it's
+an internal thing).  We can only control the latter via configuration,
+but must avoid collisions with the names of the former.  So the
+machine names here are (uselessly) prepended with a "yd-".  It's not
+possible to have a "MACHINE=x86" setting unfortunately.
