@@ -1,0 +1,40 @@
+#!/system/bin/sh
+
+# Shuts down and unmounts the yocdroid environment
+
+# FIXME: does not work when run from inside the environment because it
+# will kill itself.  That's fixable by using a separate cgroup for
+# this process and its descendents...
+
+export PATH=/system/bin:/system/xbin:/system/xbin/busybox
+
+D=/data/y
+
+killem() {
+    for pid in `cat /dev/yocdroid-cgroup/yocdroid/tasks`; do
+	kill -$1 $pid
+    done
+}
+
+# Loop for a while delivering a catchable SIGTERM
+for i in 1 2 3 4 5 6; do
+    grep -q . /dev/yocdroid-cgroup/yocdroid/tasks || break
+    killem TERM
+    sleep 1
+done
+
+# Then kill them all with predjudice
+if grep -q . /dev/yocdroid-cgroup/yocdroid/tasks; then
+    killem KILL
+    sleep 1
+fi
+
+# Note busybox awk...  The "sort -r" is to guarantee that submounts
+# get unmounted before the enclosing mount.
+for i in `awk '{print $2}' /proc/mounts | grep "^$D" | sort -r`; do
+    umount $i
+done
+
+umount /dev/yocdroid-cgroup
+rmdir /dev/yocdroid-cgroup
+

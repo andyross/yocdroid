@@ -78,7 +78,6 @@ install-ssh: wrappers
 	rm -f sshkeystmp
 
 start: wrappers
-	adb shell $(SU) $(D)/sbin/yocdroid-start
 	adb shell $(SU) $(D)/sbin/yocdroid-run /etc/init.d/rc 3
 
 machine.mak:

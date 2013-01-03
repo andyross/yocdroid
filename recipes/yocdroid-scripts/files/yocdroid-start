@@ -9,6 +9,11 @@ export PATH=/system/bin:/system/xbin:/system/xbin/busybox
 
 D=/data/y
 
+# Make a cgroup hierarchy for yocdroid processes
+mkdir -p /dev/yocdroid-cgroup
+mount -t cgroup -o none,name=yocdroid cgroup /dev/yocdroid-cgroup
+mkdir -p /dev/yocdroid-cgroup/yocdroid
+
 domount() {
     fs=$1
     awk '{print $2}' /proc/mounts | grep -q "^$D$fs$" && return

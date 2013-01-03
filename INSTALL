@@ -65,14 +65,20 @@ Once installed, at a root shell root on the device, run
 Then "/data/y/sbin/yocdroid-run [command...]" will run the specified
 command (by default a login shell) in the chroot.  Remember that the
 path to the command must be a full path relative to the root of the
-chroot.
+chroot. (Actually yocdroid-run will invoke yocdroid-start as needed
+automatically.)
 
 A very useful trick is running:
 
-    adb shell /data/y/sbin/yocdroid-start
     adb shell /data/y/sbin/yocdroid-run /etc/init.d/rc 3
 
 ...to launch all the runlevel 3 daemons, including sshd.  There is a
 "make start" convenience target which does exactly this.  The same
 commands can be added as a service in /init.rc to launch the
 environment automatically at boot.
+
+If you want to shut down the yocdroid environment (for example, to
+remove the files without manually unmounting all the bind mounts),
+there is a /data/y/sbin/yocdroid-stop script to do this.  Note that it
+must be run from *outside* the environment (e.g. at an adb shell or in
+a device terminal).

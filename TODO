@@ -1,8 +1,11 @@
-+ Bootstrap installation which requires just root access for a single
-  toolbox-based script.
++ Move to a loopback-mounted filesystem image instead of a directory.
+  The recursive bind mount of /data is just too dangerous.
+  Alternatively put the root in a tmpfs.  Similarly: use a remount -o
+  suid,exec,dev on the yocdroid rootfs if it's mounted from /data
 
-+ Add a cgroups-based "stop" utility to reliably shutdown the
-  yocdroid environment and remove all the bind mounts.
++ Similarly separate a mostly-read-only root from volatiles like
+  /home, /var such that the root can be replaced without wiping the
+  system.
 
 + netlink solution to detect mount/umount events and maintain the bind
   mounts dynamically
@@ -15,12 +18,17 @@
   this should work per the valgrind site.
 
 + Make non-arch links for the binutils binaries so the user can do
-  e.g. "readelf" on the target.
-
-+ Put the root in a tmpfs, bind mounting /data/y such that it can be
-  remounted suid.
+  e.g. "readelf" instead of "$ARCH-readelf" on the target.
 
 + Android userid unification.  Add a /home/shell while at it and
   integrate with the install-ssh step.  One way to do this is directly
   manipulating the passwd/group files, but investigate the glibc nss
   interface for a slicker solution.
+
++ yocdroid-run should check for and start the environment if it's not
+  already running
+
++ Make yocdroid-stop run from inside the environment.  Would need to
+  create a cgroup directory for itself and exit the yocdroid one;
+  might need portability work to run with /bin/sh vs. AOSP.  Bonus
+  points for hooking the initscripts.

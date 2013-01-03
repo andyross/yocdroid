@@ -1,7 +1,7 @@
 BUGS:
 
 + No meaningful effort has been made to secure the installation.
-  There are no known holes (it lives in /data, which is not writable
+  There are no known holes (it lives in /data/y, which is not writable
   to apps), but for the moment it's safest to assume that a clever
   downloaded app will be able to bootstrap local root access if
   yocdroid is installed.
@@ -11,10 +11,6 @@ BUGS:
   that aren't in AOSP.  It would be nice to make these work on AOSP
   alone.  How about copying the Yocto busybox+libc.so and running them
   with a wrapper script?
-
-+ There is no way to "stop" the environment.  The bind mounts won't
-  unmount until all the processes using them are killed.  Consider
-  placing them all in a cgroup a-la systemd...
 
 + The kernel initrd rootfs cannot be bind mounted.  So the yocdroid
   chroot has no access to it (it's read-only and non-persistent, of
@@ -45,11 +41,9 @@ BUGS:
 
 + On a default android device, the nosuid flag for /data is inherited
   by the bind mount, so suid binaries won't work.  For remote access
-  via a root shell that's fine that's fine, but local access from an
-  app (e.g. Term.apk) context requires a working su.  It also prevents
+  via a root shell that's fine, but local access from an app
+  (e.g. Term.apk) context requires a working su.  It also prevents
   many utilities (e.g. ping) from running as non-root users.
-
-Minor:
 
 + AOSP "su" appears not to propagate failed result codes to the parent
   process, so the installer is fragile on those systems -- everything

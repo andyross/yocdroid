@@ -5,12 +5,18 @@ export PATH=/system/xbin/busybox:/system/bin:/system/xbin
 
 D=/data/y
 
+# Start the environment if needed
+grep -q /dev/yocdroid-cgroup /proc/mounts || $D/sbin/yocdroid-start
+
 # Finally enter the chroot, clear the environment and launch a shell
 cd $D
 for i in $(env | sed 's/=.*//'); do unset $i; done
 export PATH=/bin:/sbin:/usr/bin:/usr/sbin:/system/bin:/system/xbin
 export TERM=xterm
 export HOME=/home/root
+
+# Add this process and all of our descendents to the yocdroid cgroup
+echo $$ > /dev/yocdroid-cgroup/yocdroid/tasks
 
 if [ -z "$1" ]; then
     exec $D/sbin/chroot-static $D /bin/bash -l
