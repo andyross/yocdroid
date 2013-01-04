@@ -43,7 +43,7 @@ bbwrap:
 	@echo "OEROOT=$(OEROOT)" >> $@
 	@echo "PATH=$(PATH)" >> $@
 	@echo "BB_ENV_EXTRAWHITE=\"$(BB_ENV_EXTRAWHITE)\"" >> $@
-	@echo "export OEROOT BB_ENV_EXTRAWHITE" >> $@
+	@echo "export MACHINE OEROOT BB_ENV_EXTRAWHITE" >> $@
 	@echo 'exec bitbake "$$@"' >> $@
 	@chmod 755 $@
 
