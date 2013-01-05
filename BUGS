@@ -6,11 +6,8 @@ BUGS:
   downloaded app will be able to bootstrap local root access if
   yocdroid is installed.
 
-+ The installation and starup process depends on a busybox tar and
-  bzip2.  The startup process depends on various busybox utilities
-  that aren't in AOSP.  It would be nice to make these work on AOSP
-  alone.  How about copying the Yocto busybox+libc.so and running them
-  with a wrapper script?
++ The installation (but not runtime) process depends on a busybox tar
+  and bzip2.
 
 + The kernel initrd rootfs cannot be bind mounted.  So the yocdroid
   chroot has no access to it (it's read-only and non-persistent, of
@@ -18,20 +15,8 @@ BUGS:
   the current system).  Maybe make copies of the files in root and
   bind mount subdirectories?
 
-+ The bind mount environment is static and doesn't track changes to
-  the filesystem (e.g. app asec mounts) automatically.  This could be
-  handled with a small daemon listening on a netlink socket.
-
-+ The recursive bind mount (/data/y/data is a mount of /data -- it
-  lives inside itself) seems to trigger a kernel bug where mounting
-  inside /data produces two copies of the mount, one in the expected
-  place and another under /data/y.
-
 + There is no integration with the Android user/group IDs.  Everything
   but root appears as a numeric ID to the linux personality.
-  Amusingly, the list is statically defined (in C code!) in
-  system/core/include/private/android_filesystem_config.h.  This list
-  should be merged with the core IDs in the base-passwd package.
 
 + The procps utilities (uptime is the most obvious to test) report a
   warning of "Unknown HZ value! (xx) Assume 100."  Frustratingly
@@ -47,5 +32,8 @@ BUGS:
 
 + AOSP "su" appears not to propagate failed result codes to the parent
   process, so the installer is fragile on those systems -- everything
-  seems to work.
+  seems to work even if it doesn't.  Systems (e.g Cyanogenmod) using
+  Superuser.apk's su binary do the right thing.
 
++ The Yocto atd daemon is installed but not started.  It's initscript
+  lacks the proper header.

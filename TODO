@@ -1,16 +1,27 @@
++ Get license ducks in order.  Make sure the top-level source has a
+  license and clarify where subpackages differ.  The gdb threads
+  library is the big one here.
+
 + Move to a loopback-mounted filesystem image instead of a directory.
-  The recursive bind mount of /data is just too dangerous.
-  Alternatively put the root in a tmpfs.  Similarly: use a remount -o
-  suid,exec,dev on the yocdroid rootfs if it's mounted from /data
+  The recursive bind mount of /data is just too dangerous.  It also
+  has the advantage of not requiring tar/bzip2 at install time and can
+  eliminate the bootstrap busybox dependency.  Alternatively, consider
+  putting the root in a tmpfs.  Similarly: use a remount -o
+  suid,exec,dev on filesystems bind mounted from /data
 
 + Similarly separate a mostly-read-only root from volatiles like
   /home, /var such that the root can be replaced without wiping the
-  system.
+  system.  Get this mostly for free with an ext4 image.
 
-+ netlink solution to detect mount/umount events and maintain the bind
-  mounts dynamically
++ Android userid unification.  Add a /home/shell while at it and
+  integrate with the install-ssh step.  One way to do this is directly
+  manipulating the passwd/group files in the base-passwd package, but
+  investigate the glibc nss interface for a slicker solution.
+  Amusingly, the list is statically defined (in C code!) in
+  system/core/include/private/android_filesystem_config.h.
 
-+ Come up with a recipe for running dalvik UI apps
++ Come up with a recipe for running dalvik UI apps outside of zygote,
+  or maybe just of restarting zygote inside the chroot.
 
 + dmidecode recipe
 
@@ -20,15 +31,12 @@
 + Make non-arch links for the binutils binaries so the user can do
   e.g. "readelf" instead of "$ARCH-readelf" on the target.
 
-+ Android userid unification.  Add a /home/shell while at it and
-  integrate with the install-ssh step.  One way to do this is directly
-  manipulating the passwd/group files, but investigate the glibc nss
-  interface for a slicker solution.
++ Turn off UseDNS in the sshd config
 
-+ yocdroid-run should check for and start the environment if it's not
-  already running
++ Stuff a wakelock into $PS1 or the like to make interactive shell use
+  not suck.
 
-+ Make yocdroid-stop run from inside the environment.  Would need to
-  create a cgroup directory for itself and exit the yocdroid one;
-  might need portability work to run with /bin/sh vs. AOSP.  Bonus
-  points for hooking the initscripts.
++ Add stuff like ls and (e|f)?grep "--color=auto" aliases to
+  /etc/profile.d.  Maybe just copy the ones from Fedora coreutils...
+
++ tmux recipe?  I hate screen...

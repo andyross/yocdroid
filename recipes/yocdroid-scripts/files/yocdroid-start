@@ -5,34 +5,27 @@
 # This bootstrap shell script is designed to run using only the
 # Android toolbox environment.
 
-export PATH=/system/bin:/system/xbin:/system/xbin/busybox
-
 D=/data/y
+CGDIR=/dev/yocdroid-cgroup
+CGTASKS=$CGDIR/yocdroid/tasks
 
 # Make a cgroup hierarchy for yocdroid processes
-mkdir -p /dev/yocdroid-cgroup
-mount -t cgroup -o none,name=yocdroid cgroup /dev/yocdroid-cgroup
-mkdir -p /dev/yocdroid-cgroup/yocdroid
+mkdir -p $CGDIR
+mount -t cgroup -o none,name=yocdroid cgroup $CGDIR
+mkdir -p $CGDIR/yocdroid
 
-domount() {
-    fs=$1
-    awk '{print $2}' /proc/mounts | grep -q "^$D$fs$" && return
-    mkdir -p "$D/$fs"
-    mount -o bind "$fs" "$D$fs"
-}
+# Add our own pid to that cgroup so persistent tasks we spawn
+# (e.g. yocdroid-mountd) get killed appropriately at stop time.
+echo $$ > $CGTASKS
 
-# Bind mount all filesystems under $D, except (obviously) for the
-# root, and also the filesystem that contains $D (hardcoded to /data
-# here) which must be done last (see below).
-for i in `awk '{print $2}' /proc/mounts | grep -v "^$D" | sort`; do
-    if test "$i" != "/" -a "$i" != "/data"; then
-	domount $i
-    fi
-done
+# Initialize the bind mounts, then spawn the daemon to maintain it
+$D/sbin/yocdroid-mountall
+$D/sbin/yocdroid-mountd $D/sbin/yocdroid-mountall
 
 # Presumptive bug (or a feature I don't understand) workaround: do
-# /data last because mounting something inside a directory that has
-# already been bind mounted actually doubles the depth.  That is, if
-# "/data/y/data" is already a bind mount to "/data", then mounting
+# /data last because bind mounting something inside a directory that
+# has already been bind mounted actually doubles the depth.  That is,
+# if "/data/y/data" is already a bind mount to "/data", then mounting
 # "/data/y/acct" actually puts the mount under "/data/y/data/y/acct"
-domount /data
+mkdir -p $D/data
+mount -o bind /data $D/data

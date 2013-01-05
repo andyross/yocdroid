@@ -1,40 +1,46 @@
 #!/system/bin/sh
 
 # Shuts down and unmounts the yocdroid environment
-
-# FIXME: does not work when run from inside the environment because it
-# will kill itself.  That's fixable by using a separate cgroup for
-# this process and its descendents...
-
-export PATH=/system/bin:/system/xbin:/system/xbin/busybox
+#
+# NOTE: cannot work when run from inside the environment because it
+# cannot unmount all the filesystems (which are in use by definition,
+# because files in them are mapped into this process!).  Should
+# probably check for this before killing anything...
 
 D=/data/y
+CGROUPDIR=/dev/yocdroid-cgroup
+CGTASKS=$CGROUPDIR/yocdroid/tasks
 
 killem() {
-    for pid in `cat /dev/yocdroid-cgroup/yocdroid/tasks`; do
+    for pid in `cat $CGTASKS`; do
 	kill -$1 $pid
     done
 }
 
 # Loop for a while delivering a catchable SIGTERM
 for i in 1 2 3 4 5 6; do
-    grep -q . /dev/yocdroid-cgroup/yocdroid/tasks || break
     killem TERM
+    grep -q . $CGTASKS || break
     sleep 1
 done
 
 # Then kill them all with predjudice
-if grep -q . /dev/yocdroid-cgroup/yocdroid/tasks; then
+if grep -q . $CGTASKS; then
     killem KILL
     sleep 1
 fi
 
-# Note busybox awk...  The "sort -r" is to guarantee that submounts
-# get unmounted before the enclosing mount.
-for i in `awk '{print $2}' /proc/mounts | grep "^$D" | sort -r`; do
-    umount $i
-done
+umount $CGROUPDIR
+rmdir $CGROUPDIR
 
-umount /dev/yocdroid-cgroup
-rmdir /dev/yocdroid-cgroup
+# Unmount all filesystems under $D.  See similar code in
+# yocdroid-mountall for explanation of how this works...
+MOUNTS=`{ while read a b cdefg; do echo $b; done } < /proc/mounts | grep "^$D"`
+test -z "$MOUNTS" || MOUNTS=`toolbox ls -d $MOUNTS`
+for d in $MOUNTS; do
+    MOUNTS_RSORTED="$d $MOUNTS_RSORTED"
+done
+for d in $MOUNTS_RSORTED; do
+    umount $d
+done
 

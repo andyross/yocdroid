@@ -5,23 +5,28 @@ With it, you can have a (more or less) fully integratied "real" Linux
 command line environment on your Android machine without losing the
 ability to interoperate with the core Android world.  For example:
 
-+ bash, perl, python, ssh, curl, wget.  Cron jobs!  Hook
-  /etc/rc.local!  Use "file" on unknown data.
++ It's linux: bash, perl, python, ssh, curl, wget.  Cron jobs!  Use
+  "file" on unknown data.
+
++ Android stuff works like you expect: "getprop ro.whatever", "pm
+  install something.apk", "am start ...".  Script activity and intent
+  management using robust tools.
 
 + Find your device on any local network via Avahi/Zeroconf
-  ("avahi-browse -a", "ssh andy-ivb.local")
+  ("avahi-browse -a", "ssh andyphone.local").  Android as of 4.2 still
+  lacks a mDNS responder running by default.
 
 + Terminals spawned from ssh instead of adb understand SIGWINCH and
   get proper settings for LINES/COLUMNS.  No more broken terminal
   output.
 
-+ Run lspci/lsusb to get human-readable output.
++ Run lspci/lsusb to get human-readable output (on devices with PCI or
+  USB host buses, of course).
 
-+ Run acpid/acpi_listen to inspect firmware events.
++ Run acpid/acpi_listen to inspect firmware events (likewise on
+  compatible hardware).
 
-+ Android stuff works like you expect: "getprop ro.whatever", "pm
-  install something.apk", "am start ...".  Script activity and intent
-  management using robust tools.
++ netstat, iptables, tcpdump, iwconfig/iwlist (for compatible hardware)
 
 + Attach a local gdb to an android process.  This is tons eaiser than
   messing with gdbserver and for simple debugging just as good (you
@@ -29,7 +34,9 @@ ability to interoperate with the core Android world.  For example:
   info in the backtrace, of course).  It even works with Bionic
   pthreads!
 
-+ netstat, iptables, tcpdump, iwconfig/iwlist (for compatible hardware)
-
 + Mount the android filesystem locally via sshfs.  Mount remote
-  filesystems on the Android box over sshfs.
+  filesystems on the Android box over sshfs.  Edit files on the
+  Android box over ssh using TRAMP mode in emacs or equivalent.
+
++ Run a persistent screen session on your device for long-running
+  console tools.

@@ -1,0 +1,77 @@
+#!/system/bin/sh
+
+# This tool is run at initialization time, and from yocdroid-mountd
+# whenever /proc/mounts shows a change.  It enumerates all mounts on
+# the system (with the exception of /data, see notes in
+# yocdroid-start) and ensures they are duplicated underneath the
+# yocdroid chroot.
+#
+# It runs using only the AOSP toolbox and sh binaries, which
+# necessitates some oddball shell hackery to get around the lack of
+# POSIX tools.  Seem comments.
+
+D=/data/y
+MLIST=$D/ymounts
+
+allmounts() { { while read a b cdefg; do echo $b; done } < /proc/mounts; }
+
+# The grep expression matches "/", "/data", or "/data/$D".  The rootfs
+# cannot be bind mounted, and the /data mount is handled separately at
+# initialization time.
+checkmounts() { allmounts | grep -v "^/\(data\($D\)\{0,1\}\)\{0,1\}$"; }
+
+# Turn a space-separated variable into a newline-separated stream for
+# grepping
+catlist() { for i in $*; do echo $i; done; }
+
+do_mount() {
+    mkdir -p "$1";
+    mount -o bind "$1" "$D$1";
+    grep -q "^$1$" $MLIST || echo "$1" >> $MLIST
+}
+
+do_unmount() {
+    umount "$1"
+    grep -v "^$1$" $MLIST > $MLIST.tmp
+    mv $MLIST.tmp $MLIST
+}
+
+YMOUNTS=`checkmounts | grep "^$D"`
+AMOUNTS=`checkmounts | grep -v "^$D"`
+
+# AOSP lacks a tool (ed, awk or sed would do fine) to parse off the
+# /data/y, so we have to add it back to the real mount path and grep
+# against ymounts.  Accumulate filesystem to mount in $need
+for d in $AMOUNTS; do
+    catlist $YMOUNTS | grep -q "^$D$d$" || need="$need $d"
+done
+
+# Similarly check for unused mounts under $D which don't match
+# filesystems in the root *and* appear in /data/y/ymounts (i.e. we
+# mounted them).  These should be unmounted.
+for am in $AMOUNTS; do
+    catlist $YMOUNTS | grep -q '^$D$am$' || {
+	grep -q "^$d$" $MLIST && unused="$unused $d"
+    }
+done
+
+# Must sort (so that submounts like /dev/pts get mounted after their
+# enclosing filesystems), but have no sort.  Thankfully toolbox "ls"
+# sorts output (though if $need is empty it returns ".", which we must
+# check for).
+test -z "$need" || need=`/system/bin/ls -d $need`
+
+for d in $need; do
+    do_mount $d
+done
+
+# Similarly sort filesystems to unmount, but more complicated because
+# we need a reverse sort and AOSP ls doesn't support -r...
+test -z "$unused" || need=`/system/bin/ls -d $unused`
+for d in $unused; do
+    unused_r="$d $unused_r"
+done
+
+for d in $unused_r; do
+    do_umount $d
+done

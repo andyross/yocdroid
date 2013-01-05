@@ -1,3 +1,19 @@
+Requirements
+============
+
+The host machine should be a Linux box capable of building Yocto Poky
+Linux.  This amounts basically to a working gcc and make.  Most of the
+distribution toolchain builds itself via bootstrap.  (FIXME: get a
+proper package list here for common distros.)
+
+The Android device should have adb access working and a "su" binary
+that works to achieve root access from an adb context.  Both AOSP su
+and Cyanogenmod su have been tested, but note that AOSP-derived builds
+only have root access with "eng" configurations and that CM 10.1
+defaults to "non-developer" mode now (click on Settings->About->Build
+number 7 times to enable, and set Settings->Developer->Root access to
+"Apps and ADB").
+
 Building
 ========
 
@@ -15,34 +31,17 @@ MACHINE variable to make.  Choices currently supported are "yd-arm"
 
     make MACHINE=yd-arm
 
-The build will automatically download original source tarballs for all
-the installed software (typically from high performance mirrors run by
-yoctoproject.org).  The resulting files (about 6GB) will be placed in
-the "oe-downloads" subdirectory of the user's home directory.  This is
-so that repeated builds or "cleaned" trees don't need to re-download
-source.  Do not delete this directory or its contents or you will
-force a re-fetch.
+The build process will automatically download original source tarballs
+for all the installed software (typically from high performance
+mirrors run by yoctoproject.org).  The resulting files (about 6GB of
+downloaded content) will be placed in the "oe-downloads" subdirectory
+of the user's home directory and not (!) under the project build
+directory.  This is so that repeated builds or "cleaned" trees don't
+need to re-download source.  Do not delete this directory or its
+contents or you will force a re-fetch.
 
-If you want to work directly with bitbake (which is notoriously
-sensitive to a correct build environment and working directory), the
-Makefile will create a "bbwrap" wrapper script for you ("make bbwrap")
-which sets up the environment correctly and then launches bitbake with
-the supplied arguments.  So e.g. "./bbwrap -c devshell
-my-package-name" does what you want.  The wrapper script will default
-to the same MACHINE argument that make was invoked with, but this can
-be overriden in the environment:
-
-    MACHINE=yd-armv7 ./bbwrap [...]
-
-You may edit the installed package list directly in
-recipes/yocdroid-image/yocdroid-image.bb or with an IMAGE_INSTALL
-setting in conf/local.conf:
-
-    IMAGE_INSTALL_append = "package1 package2 ..."
-
-The IMAGE_FEATURES mechanism from Yocto works as well, but be careful
-with it because many of the existing default package lists tend to
-pull in unwanted dependencies.
+The build takes about an hour on a quad core 3GHz machine, and
+produces about 9GB of temporary data and a ~60MB output tarball.
 
 Installing
 ==========
@@ -82,3 +81,50 @@ remove the files without manually unmounting all the bind mounts),
 there is a /data/y/sbin/yocdroid-stop script to do this.  Note that it
 must be run from *outside* the environment (e.g. at an adb shell or in
 a device terminal).
+
+Hints
+=====
+
+The Avahi service uses the net.hostname property (settable on CM 10.1
+under Developer options -- this is *not* the same a the kernel
+host/domainname which is always "localhost.localdomain") as the
+hostname.  So on a modern Linux distro you can find attached device on
+your local network as "<hostname>.local" and ssh right to it without
+trying to figure out an IP address.  Eventually Google will catch up
+and enable mDNS by default...
+
+A useful trick, if you use Jack Palevich's Terminal.apk for on-device
+shells, is to set the shell command in preferences to "/system/xbin/su
+-c /data/y/sbin/yocdroid-run" so you get the Yocdroid environment by
+default.
+
+Starting yocdroid at device boot has no single solution; the init.rc
+configuration in the general case is fixed in the initrd and cannot be
+modified without reflashing a kernel.  For the special case of
+Cyanogenmod 10.1, the boot scripts run a /data/local/userinit.sh
+script.  You can make this a symlink to /data/y/sbin/yocdroid-start or
+call it as part of a larger script.
+
+Hacking
+=======
+
+If you want to work directly with bitbake (which is notoriously
+sensitive to a correct build environment and working directory), the
+Makefile will create a "bbwrap" wrapper script for you ("make bbwrap")
+which sets up the environment correctly and then launches bitbake with
+the supplied arguments.  So e.g. "./bbwrap -c devshell
+my-package-name" does what you want.  The wrapper script will default
+to the same MACHINE argument that make was invoked with, but this can
+be overriden in the environment:
+
+    MACHINE=yd-armv7 ./bbwrap [...]
+
+You may edit the installed package list directly in
+recipes/yocdroid-image/yocdroid-image.bb or with an IMAGE_INSTALL
+setting in conf/local.conf:
+
+    IMAGE_INSTALL_append = "package1 package2 ..."
+
+The IMAGE_FEATURES mechanism from Yocto works as well, but be careful
+with it because many of the existing default package lists tend to
+pull in unwanted dependencies.
