@@ -22,12 +22,11 @@ works fine) as "./poky".  You can get this from the upstream git with:
 
     git clone git://git.yoctoproject.org/poky
 
-Building an image is as simple as "make".  The output tarball will
-appear in tmp/deploy/images.  Simply unpack this under /data/y on your
-Android device.  The target architecture can be specified by passing a
-MACHINE variable to make.  Choices currently supported are "yd-arm"
-(most compatible, and default), "yd-armv7" (for modern devices) and
-"yd-x86" (for IA32 machines), e.g.:
+Building an image is broadly as simple as "make".  The target
+architecture can be specified by passing a MACHINE variable to make.
+Choices currently supported are "yd-arm" (most compatible, and
+default), "yd-armv7" (for modern devices) and "yd-x86" (for IA32
+machines), e.g.:
 
     make MACHINE=yd-arm
 
@@ -41,15 +40,17 @@ need to re-download source.  Do not delete this directory or its
 contents or you will force a re-fetch.
 
 The build takes about an hour on a quad core 3GHz machine, and
-produces about 9GB of temporary data and a ~60MB output tarball.
+produces about 9GB of temporary data and a ~50MB output tarball.
 
 Installing
 ==========
 
-The result tarball expects to be unpacked under /data/y on the target.
-There is a "make install" target currently that does this
-automatically over adb to the default connected device, though it
-depends on finding an installed busybox (for tar/bzip2).
+The tarball produced by the build (which you can find in
+./tmp/deploy/images) expects to be unpacked under /data/y on the
+target.  You can do this manually (as root), or use the "make install"
+target that does this automatically over adb to the default connected
+device, though it currently depends on finding an installed busybox
+(for tar/bzip2).
 
 Optionally, there is a "make install-ssh" target available to
 bootstrap ssh authentication over adb using the current user's public
@@ -72,15 +73,13 @@ A very useful trick is running:
     adb shell /data/y/sbin/yocdroid-run /etc/init.d/rc 3
 
 ...to launch all the runlevel 3 daemons, including sshd.  There is a
-"make start" convenience target which does exactly this.  The same
-commands can be added as a service in /init.rc to launch the
-environment automatically at boot.
+"make start" convenience target which does exactly this.
 
 If you want to shut down the yocdroid environment (for example, to
 remove the files without manually unmounting all the bind mounts),
 there is a /data/y/sbin/yocdroid-stop script to do this.  Note that it
-must be run from *outside* the environment (e.g. at an adb shell or in
-a device terminal).
+must be run from *outside* the yocdroid environment (e.g. at an adb
+shell or in a device terminal).
 
 Hints
 =====
@@ -107,6 +106,11 @@ call it as part of a larger script.
 
 Hacking
 =======
+
+Yocdroid is a based the Yocto Project's Poky Linux distribution, and
+uses openembedded-style (aside: yes, all three names get used to refer
+to what is for most purposes the same code base) recipes that can be
+modified as you expect.
 
 If you want to work directly with bitbake (which is notoriously
 sensitive to a correct build environment and working directory), the

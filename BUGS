@@ -6,17 +6,20 @@ BUGS:
   downloaded app will be able to bootstrap local root access if
   yocdroid is installed.
 
-+ The installation (but not runtime) process depends on a busybox tar
-  and bzip2.
++ There is no integration with the Android user/group IDs.  Everything
+  but root appears as a numeric ID to the linux personality.
+
++ The installation process depends on a busybox tar and bzip2 to
+  unpack the tarball.
+
++ yocdroid-run still needs busybox to get a list of local environment
+  variables to clear.
 
 + The kernel initrd rootfs cannot be bind mounted.  So the yocdroid
   chroot has no access to it (it's read-only and non-persistent, of
   course, but sometimes it's nice to check what the init.rc said for
   the current system).  Maybe make copies of the files in root and
   bind mount subdirectories?
-
-+ There is no integration with the Android user/group IDs.  Everything
-  but root appears as a numeric ID to the linux personality.
 
 + The procps utilities (uptime is the most obvious to test) report a
   warning of "Unknown HZ value! (xx) Assume 100."  Frustratingly
@@ -26,9 +29,9 @@ BUGS:
 
 + On a default android device, the nosuid flag for /data is inherited
   by the bind mount, so suid binaries won't work.  For remote access
-  via a root shell that's fine, but local access from an app
-  (e.g. Term.apk) context requires a working su.  It also prevents
-  many utilities (e.g. ping) from running as non-root users.
+  via a root shell that's fine, but local access from an app context
+  requires a working su to bootstrap.  It also prevents many utilities
+  (e.g. ping) from running correctly as non-root users.
 
 + AOSP "su" appears not to propagate failed result codes to the parent
   process, so the installer is fragile on those systems -- everything
@@ -38,5 +41,3 @@ BUGS:
 + The Yocto atd daemon is installed but not started.  It's initscript
   lacks the proper header.
 
-+ yocdroid-run still needs busybox to get a list of local environment
-  variables to clear.  Maybe write a syscall-asm/C program for that?

@@ -1,7 +1,3 @@
-+ Get license ducks in order.  Make sure the top-level source has a
-  license and clarify where subpackages differ.  The gdb threads
-  library is the big one here.
-
 + Move to a loopback-mounted filesystem image instead of a directory.
   The recursive bind mount of /data is just too dangerous.  It also
   has the advantage of not requiring tar/bzip2 at install time and can
