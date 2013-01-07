@@ -7,25 +7,32 @@
 
 D=/data/y
 CGDIR=/dev/yocdroid-cgroup
-CGTASKS=$CGDIR/yocdroid/tasks
 
-# Make a cgroup hierarchy for yocdroid processes
+if grep -q $CGDIR /proc/mounts; then
+    echo Yocdroid already started 1>&2
+    exit 1
+fi
+
+# Make a cgroup hierarchy for yocdroid processes and add our own pid
+# to that cgroup so persistent tasks we spawn (yocdroid-mountd) get
+# killed appropriately at stop time.
 mkdir -p $CGDIR
 mount -t cgroup -o none,name=yocdroid cgroup $CGDIR
 mkdir -p $CGDIR/yocdroid
+echo $$ > $CGDIR/yocdroid/tasks
 
-# Add our own pid to that cgroup so persistent tasks we spawn
-# (e.g. yocdroid-mountd) get killed appropriately at stop time.
-echo $$ > $CGTASKS
-
-# Initialize the bind mounts, then spawn the daemon to maintain it
+# Initialize the chroot environment
+rm -f $D/ymounts
 $D/sbin/yocdroid-mountall
-$D/sbin/yocdroid-mountd $D/sbin/yocdroid-mountall
 
 # Presumptive bug (or a feature I don't understand) workaround: do
-# /data last because bind mounting something inside a directory that
-# has already been bind mounted actually doubles the depth.  That is,
-# if "/data/y/data" is already a bind mount to "/data", then mounting
-# "/data/y/acct" actually puts the mount under "/data/y/data/y/acct"
+# /data last because bind mounting something from a chroot inside a
+# directory that has already been bind mounted actually doubles the
+# depth.  That is, if "/data/y/data" is already a bind mount to
+# "/data", then mounting "/data/y/acct" also puts the mount under
+# "/data/y/data/y/acct".
 mkdir -p $D/data
 mount -o bind /data $D/data
+
+# Finally spawn the daemon to maintain the mounts
+$D/sbin/yocdroid-mountd $D/sbin/yocdroid-mountall

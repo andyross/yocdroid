@@ -6,13 +6,16 @@
 # yocdroid-start) and ensures they are duplicated underneath the
 # yocdroid chroot.
 #
-# It runs using only the AOSP toolbox and sh binaries, which
-# necessitates some oddball shell hackery to get around the lack of
-# POSIX tools.  Seem comments.
+# It uses only the AOSP toolbox and sh binaries, which necessitates
+# some oddball shell hackery to get around the lack of POSIX tools.
+# See comments.
 
 D=/data/y
 MLIST=$D/ymounts
 
+echo yocdroid-mountall
+
+# Use read to parse out the second field in /proc/mounts
 allmounts() { { while read a b cdefg; do echo $b; done } < /proc/mounts; }
 
 # The grep expression matches "/", "/data", or "/data/$D".  The rootfs
@@ -20,28 +23,33 @@ allmounts() { { while read a b cdefg; do echo $b; done } < /proc/mounts; }
 # initialization time.
 checkmounts() { allmounts | grep -v "^/\(data\($D\)\{0,1\}\)\{0,1\}$"; }
 
-# Turn a space-separated variable into a newline-separated stream for
-# grepping
+# Turn a space-separated variable into a line-oriented stream for grepping
 catlist() { for i in $*; do echo $i; done; }
 
-do_mount() {
-    mkdir -p "$1";
-    mount -o bind "$1" "$D$1";
-    grep -q "^$1$" $MLIST || echo "$1" >> $MLIST
+# Unbelievable hack.  Mounts must be done in prefix order (i.e. /dev
+# before /dev/pts), yet we have no sort utility which would do that
+# for us.  So loop over a grep pulling out path lengths up to 64
+# characters.  Writes the sorted list (shortest first) back to the
+# variable, and a reverse-sorted list to ${1}_r
+lensort() {
+    local varname=$1 pat=. result result_r
+    while echo $pat | grep -v -q '^\.\{64\}\.'; do
+	local matched=$(catlist $(eval echo \$$varname) | grep "^$pat$")
+	result_r="$matched $result_r"
+	result="$result $matched"
+	pat=".$pat"
+    done
+    eval $varname=\"$result\"
+    eval ${varname}_r=\"$result_r\"
 }
 
-do_unmount() {
-    umount "$1"
-    grep -v "^$1$" $MLIST > $MLIST.tmp
-    mv $MLIST.tmp $MLIST
-}
-
-YMOUNTS=`checkmounts | grep "^$D"`
-AMOUNTS=`checkmounts | grep -v "^$D"`
+YMOUNTS=`checkmounts | grep "^$D"`    # yocdroid chroot mounts
+AMOUNTS=`checkmounts | grep -v "^$D"` # android-space mounts
 
 # AOSP lacks a tool (ed, awk or sed would do fine) to parse off the
-# /data/y, so we have to add it back to the real mount path and grep
-# against ymounts.  Accumulate filesystem to mount in $need
+# /data/y, so we have test for it in the opposite order by adding it
+# back to the real mount path and grepping against ymounts.
+# Accumulate filesystems to mount in $need
 for d in $AMOUNTS; do
     catlist $YMOUNTS | grep -q "^$D$d$" || need="$need $d"
 done
@@ -50,28 +58,29 @@ done
 # filesystems in the root *and* appear in /data/y/ymounts (i.e. we
 # mounted them).  These should be unmounted.
 for am in $AMOUNTS; do
-    catlist $YMOUNTS | grep -q '^$D$am$' || {
-	grep -q "^$d$" $MLIST && unused="$unused $d"
+    catlist $YMOUNTS | grep -q "^$D$am$" || {
+	grep "^$D$am$" $MLIST && unused="$unused $D$am"
     }
 done
 
-# Must sort (so that submounts like /dev/pts get mounted after their
-# enclosing filesystems), but have no sort.  Thankfully toolbox "ls"
-# sorts output (though if $need is empty it returns ".", which we must
-# check for).
-test -z "$need" || need=`/system/bin/ls -d $need`
-
+# Sort and mount.  Add a record in $D/ymounts to record the fact that
+# we mounted the filesystem
+lensort need
 for d in $need; do
-    do_mount $d
+    mkdir -p "$d";
+    mount -o bind "$d" "$D$d";
+    grep -q "^$D$d$" $MLIST || echo "$D$d" >> $MLIST
 done
 
-# Similarly sort filesystems to unmount, but more complicated because
-# we need a reverse sort and AOSP ls doesn't support -r...
-test -z "$unused" || need=`/system/bin/ls -d $unused`
-for d in $unused; do
-    unused_r="$d $unused_r"
-done
-
+# Unmount unused filesystems (in reverse order from mouting), and
+# update the $D/ymounts file.  Note there's a mild misfeature here: we
+# know that we mounted the file, but we don't know for sure that the
+# mount point didn't already exist (it might have already been present
+# as an empty directory).  So leave it there as an empty ghost
+# directory.  Hopefully nothing breaks on something this subtle.
+lensort unused
 for d in $unused_r; do
-    do_umount $d
+    umount "$d"
+    grep -v "^$d$" $MLIST > $MLIST.tmp
+    mv $MLIST.tmp $MLIST
 done

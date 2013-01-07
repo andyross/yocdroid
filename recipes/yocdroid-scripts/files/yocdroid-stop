@@ -4,12 +4,16 @@
 #
 # NOTE: cannot work when run from inside the environment because it
 # cannot unmount all the filesystems (which are in use by definition,
-# because files in them are mapped into this process!).  Should
-# probably check for this before killing anything...
+# because files in them are mapped into this process!).
 
 D=/data/y
 CGROUPDIR=/dev/yocdroid-cgroup
 CGTASKS=$CGROUPDIR/yocdroid/tasks
+
+if grep "^$$$" $CGTASKS; then
+    echo Cannot run yocdroid-stop from inside yocdroid environment >&2
+    exit 1
+fi
 
 killem() {
     for pid in `cat $CGTASKS`; do
@@ -30,17 +34,27 @@ if grep -q . $CGTASKS; then
     sleep 1
 fi
 
+# The umount is (apparently) async, so we'll remove the directory later
 umount $CGROUPDIR
-rmdir $CGROUPDIR
 
 # Unmount all filesystems under $D.  See similar code in
 # yocdroid-mountall for explanation of how this works...
+catlist() { for i in $*; do echo $i; done; }
 MOUNTS=`{ while read a b cdefg; do echo $b; done } < /proc/mounts | grep "^$D"`
-test -z "$MOUNTS" || MOUNTS=`toolbox ls -d $MOUNTS`
-for d in $MOUNTS; do
-    MOUNTS_RSORTED="$d $MOUNTS_RSORTED"
+pat=.
+while echo $pat | grep -v -q '^\.\{64\}\.'; do
+    matched=$(catlist $MOUNTS | grep "^$pat$")
+    MOUNTS_r="$matched $MOUNTS_r"
+    pat=".$pat"
 done
-for d in $MOUNTS_RSORTED; do
+for d in $MOUNTS_r; do
     umount $d
 done
 
+# Now remove the cgroup directory, becuase it fails if done immediately
+while grep -q $CGROUPDIR /proc/mounts; do
+    echo WARNING: $CGROUPDIR is still mounted! >&2
+    sleep 1
+    umount $CGROUPDIR
+done
+rmdir $CGROUPDIR

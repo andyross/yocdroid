@@ -37,3 +37,6 @@ BUGS:
 
 + The Yocto atd daemon is installed but not started.  It's initscript
   lacks the proper header.
+
++ yocdroid-run still needs busybox to get a list of local environment
+  variables to clear.  Maybe write a syscall-asm/C program for that?
