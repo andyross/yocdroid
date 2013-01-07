@@ -22,7 +22,7 @@ mkdir -p $CGDIR/yocdroid
 echo $$ > $CGDIR/yocdroid/tasks
 
 # Initialize the chroot environment
-rm -f $D/ymounts
+echo "# Yocdroid mount list.  DO NOT EDIT OR REMOVE" > $D/ymounts
 $D/sbin/yocdroid-mountall
 
 # Presumptive bug (or a feature I don't understand) workaround: do

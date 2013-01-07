@@ -13,8 +13,6 @@
 D=/data/y
 MLIST=$D/ymounts
 
-echo yocdroid-mountall
-
 # Use read to parse out the second field in /proc/mounts
 allmounts() { { while read a b cdefg; do echo $b; done } < /proc/mounts; }
 
@@ -59,7 +57,7 @@ done
 # mounted them).  These should be unmounted.
 for am in $AMOUNTS; do
     catlist $YMOUNTS | grep -q "^$D$am$" || {
-	grep "^$D$am$" $MLIST && unused="$unused $D$am"
+	grep -q "^$D$am$" $MLIST && unused="$unused $D$am"
     }
 done
 
@@ -67,7 +65,7 @@ done
 # we mounted the filesystem
 lensort need
 for d in $need; do
-    mkdir -p "$d";
+    mkdir -p "$D$d";
     mount -o bind "$d" "$D$d";
     grep -q "^$D$d$" $MLIST || echo "$D$d" >> $MLIST
 done
