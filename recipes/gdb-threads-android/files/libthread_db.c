@@ -6,7 +6,7 @@
 #include <sys/ptrace.h>
 #include <linux/ptrace.h>
 #include <stdint.h>
-#include <gdb_thread_db.h>
+#include <thread_db.h>
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>

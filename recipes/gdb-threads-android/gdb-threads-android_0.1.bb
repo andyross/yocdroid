@@ -2,14 +2,13 @@ SUMMARY = "gdb-threads-android"
 DESCRIPTION = "Android-compatible libthread_db.so.1 for gdb thread debugging"
 HOMEPAGE = "http://android.google.com"
 
-# See the note in files/COPYING.
-LICENSE = "LGPLv3"
-LIC_FILES_CHKSUM = "file://COPYING;md5=1dfe44ec4ff387f12e822d9bbb603f2a"
+LICENSE = "GPLv2"
+LIC_FILES_CHKSUM = "file://COPYING;md5=393a5ca445f6965873eca0259a17f833"
 
 PR = "r1"
 
 SRC_URI = "file://libthread_db.c \
-           file://gdb_thread_db.h"
+           file://thread_db.h"
 
 inherit local-license
 
