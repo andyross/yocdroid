@@ -27,6 +27,7 @@ IMAGE_INSTALL = " \
     bash \
     bc \
     binutils \
+    binutils-symlinks \
     busybox \
     bzip2 \
     coreutils \
