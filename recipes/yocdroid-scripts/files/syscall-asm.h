@@ -21,55 +21,57 @@
 #include <fcntl.h>
 #include <sys/syscall.h>
 
+#define ASMV asm volatile
+
 #ifdef __x86_64
 
-long syscall1(long num, long arg1)
+static long syscall1(long num, long arg1)
 {
     long result;
-    asm("syscall" : "=a" (result) : "a"(num), "D"(arg1) : "rcx", "r11");
+    ASMV("syscall" : "=a" (result) : "a"(num), "D"(arg1) : "rcx", "r11");
     return result;
 }
 
-long syscall3(long num, long arg1, long arg2, long arg3)
+static long syscall3(long num, long arg1, long arg2, long arg3)
 {
     long result;
-    asm("syscall" : "=a" (result)
-        : "a"(num), "D"(arg1), "S"(arg2), "d"(arg3)
-        : "rcx", "r11");
+    ASMV("syscall" : "=a" (result)
+         : "a"(num), "D"(arg1), "S"(arg2), "d"(arg3)
+         : "rcx", "r11");
     return result;
 }
 
-long syscall4(long num, long arg1, long arg2, long arg3, long arg4)
+static long syscall4(long num, long arg1, long arg2, long arg3, long arg4)
 {
     long result;
-    asm("syscall" : "=a" (result)
-        : "a"(num), "D"(arg1), "S"(arg2), "d"(arg3), "g"(arg4)
-        : "rcx", "r11");
+    ASMV("syscall" : "=a" (result)
+         : "a"(num), "D"(arg1), "S"(arg2), "d"(arg3), "g"(arg4)
+         : "rcx", "r11");
     return result;
 }
 
 #elif defined(__i386)
 
-long syscall1(long num, long arg1)
+static long syscall1(long num, long arg1)
 {
     long result;
-    asm("int $0x80" : "=a"(result) : "a"(num), "b"(arg1));
+    ASMV("int $0x80" : "=a"(result) : "a"(num), "b"(arg1));
     return result;
 }
 
-long syscall3(long num, long arg1, long arg2, long arg3)
+static long syscall3(long num, long arg1, long arg2, long arg3)
 {
     long result;
-    asm("int $0x80" : "=a"(result)
-        : "a"(num), "b"(arg1), "c"(arg2), "d"(arg3));
+    ASMV("int $0x80" : "=a"(result)
+         : "a"(num), "b"(arg1), "c"(arg2), "d"(arg3));
     return result;
 }
 
-long syscall4(long num, long arg1, long arg2, long arg3, long arg4)
+static long syscall4(long num, long arg1, long arg2, long arg3, long arg4)
 {
     long result;
-    asm("int $0x80" : "=a"(result)
-        : "a"(num), "b"(arg1), "c"(arg2), "d"(arg3), "S"(arg4));
+    ASMV("int $0x80" : "=a"(result)
+         : "a"(num), "b"(arg1), "c"(arg2), "d"(arg3), "S"(arg4));
     return result;
 }
 
@@ -77,47 +79,47 @@ long syscall4(long num, long arg1, long arg2, long arg3, long arg4)
 
 // Note these work identically with -mthumb; no ARM instructions are used.
 
-long syscall1(long num, long arg1)
+static long syscall1(long num, long arg1)
 {
     long result;
-    asm("mov r7, %1\n\t"
-        "mov r0, %2\n\t"
-        "swi $0\n\t"
-        "mov r0, %0"
-        : "=r"(result)
-        : "r"(num), "r"(arg1)
-        : "r0", "r7");
+    ASMV("mov r7, %1\n\t"
+         "mov r0, %2\n\t"
+         "swi $0\n\t"
+         "mov %0, r0"
+         : "=r"(result)
+         : "r"(num), "r"(arg1)
+         : "r0", "r7");
     return result;
 }
 
-long syscall3(long num, long arg1, long arg2, long arg3)
+static long syscall3(long num, long arg1, long arg2, long arg3)
 {
     long result;
-    asm("mov r7, %1\n\t"
-        "mov r0, %2\n\t"
-        "mov r1, %3\n\t"
-        "mov r2, %4\n\t"
-        "swi $0\n\t"
-        "mov r0, %0"
-        : "=r"(result)
-        : "r"(num), "r"(arg1), "r"(arg2), "r"(arg3)
-        : "r0", "r1", "r2", "r7");
+    ASMV("mov r7, %1\n\t"
+         "mov r0, %2\n\t"
+         "mov r1, %3\n\t"
+         "mov r2, %4\n\t"
+         "swi $0\n\t"
+         "mov %0, r0"
+         : "=r"(result)
+         : "r"(num), "r"(arg1), "r"(arg2), "r"(arg3)
+         : "r0", "r1", "r2", "r7");
     return result;
 }
 
-long syscall4(long num, long arg1, long arg2, long arg3, long arg4)
+static long syscall4(long num, long arg1, long arg2, long arg3, long arg4)
 {
     long result;
-    asm("mov r7, %1\n\t"
-        "mov r0, %2\n\t"
-        "mov r1, %3\n\t"
-        "mov r2, %4\n\t"
-        "mov r3, %5\n\t"
-        "swi $0\n\t"
-        "mov r0, %0"
-        : "=r"(result)
-        : "r"(num), "r"(arg1), "r"(arg2), "r"(arg3), "r"(arg4)
-        : "r0", "r1", "r2", "r3", "r7");
+    ASMV("mov r7, %1\n\t"
+         "mov r0, %2\n\t"
+         "mov r1, %3\n\t"
+         "mov r2, %4\n\t"
+         "mov r3, %5\n\t"
+         "swi $0\n\t"
+         "mov %0, r0"
+         : "=r"(result)
+         : "r"(num), "r"(arg1), "r"(arg2), "r"(arg3), "r"(arg4)
+         : "r0", "r1", "r2", "r3", "r7");
     return result;
 }
 
@@ -127,11 +129,11 @@ long syscall4(long num, long arg1, long arg2, long arg3, long arg4)
 
 /* Define some syscalls */
 
-static int execve(char *f, char **argv, char **envp)
+int execve(char *f, char **argv, char **envp)
 { return syscall3(SYS_execve, (long)f, (long)argv, (long)envp); }
 
-static void exit(int status)
-{ syscall1(SYS_exit, status); }
+static void exit(int result)
+{ syscall1(SYS_exit, result); }
 
 static long fork(void)
 { return syscall1(SYS_fork, 0); }
@@ -155,10 +157,10 @@ static long waitpid(long pid, int *status, long opts)
 static long write(int fd, void *p, long n)
 { return syscall3(SYS_write, fd, (long)p, n); }
 
-static int chdir(char *dir)
+int chdir(char *dir)
 { return syscall1(SYS_chdir, (long)dir); }
 
-static int chroot(char *dir)
+int chroot(char *dir)
 { return syscall1(SYS_chroot, (long)dir); }
 
 /* And a minimal, um, "C library" */
@@ -173,4 +175,3 @@ static void bzero(void *buf, long n)
 { long i; for(i=0; i<n; i++) ((char*)buf)[i]=0; }
 
 #endif /* _SYSCALL_ASM_H */
-

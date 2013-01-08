@@ -53,7 +53,7 @@ void _start()
         }
 
         // Spawn and run the handler
-        if(pid = fork()) {
+        if((pid = fork())) {
             waitpid(pid, &result_dummy, 0);
         } else {
             if(execve(argv[1], &argv[1], environ)) {
