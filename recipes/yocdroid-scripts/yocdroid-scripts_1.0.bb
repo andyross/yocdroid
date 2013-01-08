@@ -13,6 +13,7 @@ SRC_URI = "file://yocdroid-start \
            file://chroot-static.c \
            file://yocdroid-mountd.c \
            file://yocdroid.sh \
+           file://yocdroid-shell.sh \
            file://app_process"
 
 inherit update-rc.d local-license
@@ -36,6 +37,7 @@ do_install() {
     install -D -m 0755 ../yocdroid-stop          ${D}${base_sbindir}/yocdroid-stop
     install -D -m 0755 ../yocdroid-run           ${D}${base_sbindir}/yocdroid-run
     install -D -m 0644 ../yocdroid.sh            ${D}${sysconfdir}/profile.d/yocdroid.sh
+    install -D -m 0644 ../yocdroid-shell.sh      ${D}${sysconfdir}/profile.d/yocdroid-shell.sh
     install -D -m 0755 ../yocdroid-dnswatch      ${D}${sbindir}/yocdroid-dnswatch
     install -D -m 0755 ../yocdroid-dnswatch.init ${D}${sysconfdir}/init.d/yocdroid-dnswatch
 }

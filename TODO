@@ -29,12 +29,6 @@
 
 + Turn off UseDNS in the sshd config
 
-+ Stuff a wakelock into $PS1 or the like to make interactive shell use
-  not suck.
-
-+ Add stuff like ls and (e|f)?grep "--color=auto" aliases to
-  /etc/profile.d.  Maybe just copy the ones from Fedora coreutils...
-
 + tmux recipe?  I hate screen...
 
 + Figure out logwrapper for mountd
