@@ -34,5 +34,6 @@ $D/sbin/yocdroid-mountall
 mkdir -p $D/data
 mount -o bind /data $D/data
 
-# Finally spawn the daemon to maintain the mounts
-$D/sbin/yocdroid-mountd $D/sbin/yocdroid-mountall
+# Finally spawn the daemon to maintain the mounts (close stdio because
+# it doesn't do it for itself, and adb will wait until the fd's hit EOF)
+$D/sbin/yocdroid-mountd $D/sbin/yocdroid-mountall </dev/null >/dev/null 2>&1

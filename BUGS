@@ -35,7 +35,3 @@ BUGS:
 
 + The Yocto atd daemon is installed but not started.  It's initscript
   lacks the proper header.
-
-+ The "make start" target is hanging.  I think this is because the
-  spawned yocdroid-mountd still has the adb stdin/stdout open.  Should
-  be fixable with logwrapper.
