@@ -2,17 +2,20 @@ Requirements
 ============
 
 The host machine should be a Linux box capable of building Yocto Poky
-Linux.  This amounts basically to a working gcc and make.  Most of the
-distribution toolchain builds itself via bootstrap.  (FIXME: get a
-proper package list here for common distros.)
+Linux.  Most of the distribution toolchain builds itself via
+bootstrap, but a few tools need to be installed on the host.  Testing
+on a fresh install of Ubuntu 12.04 (the author actually uses Fedora,
+but this was the VM I had) shows that the following is sufficient:
+
+   apt-get install build-essential git diffstat texinfo gawk chrpath
 
 The Android device should have adb access working and a "su" binary
 that works to achieve root access from an adb context.  Both AOSP su
 and Cyanogenmod su have been tested, but note that AOSP-derived builds
-only have root access with "eng" configurations and that CM 10.1
-defaults to "non-developer" mode now (click on Settings->About->Build
-number 7 times to enable, and set Settings->Developer->Root access to
-"Apps and ADB").
+only have root access with "eng" and "userdebug" configurations and
+that CM 10.1 defaults to "non-developer" mode now (click on
+Settings->About->Build number 7 times to enable, and set
+Settings->Developer->Root access to "Apps and ADB").
 
 Building
 ========
