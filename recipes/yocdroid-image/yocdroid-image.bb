@@ -93,8 +93,11 @@ IMAGE_INSTALL = " \
     zip \
 "
 
-IMAGE_INSTALL_append_x86 = " \
+
+X86_EXTRA = " \
     acpid \
     libacpi \
     pciutils \
 "
+IMAGE_INSTALL_append_x86 := "${X86_EXTRA}"
+IMAGE_INSTALL_append_x86-64 := "${X86_EXTRA}"
