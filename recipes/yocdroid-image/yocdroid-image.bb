@@ -33,6 +33,7 @@ IMAGE_INSTALL = " \
     coreutils \
     cpio \
     cronie \
+    cryptsetup \
     curl \
     e2fsprogs \
     ed \
