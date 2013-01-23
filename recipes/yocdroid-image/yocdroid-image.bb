@@ -47,6 +47,7 @@ IMAGE_INSTALL = " \
     iproute2 \
     iptables \
     iputils \
+    iw \
     ldd \
     less \
     lvm2-dm \

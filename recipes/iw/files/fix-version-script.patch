@@ -1,0 +1,32 @@
+This breaks if the build is not from iw git but happens to be run under
+a git directory from a different project.
+
+Upstream-status: innapropriate (embedded)
+
+diff --git a/version.sh b/version.sh
+index db02f0d..336ce2b 100755
+--- a/version.sh
++++ b/version.sh
+@@ -3,21 +3,7 @@
+ VERSION="3.8"
+ OUT="$1"
+ 
+-if head=`git rev-parse --verify HEAD 2>/dev/null`; then
+-	git update-index --refresh --unmerged > /dev/null
+-	descr=$(git describe)
+-
+-	# on git builds check that the version number above
+-	# is correct...
+-	[ "${descr%%-*}" = "v$VERSION" ] || exit 2
+-
+-	v="${descr#v}"
+-	if git diff-index --name-only HEAD | read dummy ; then
+-		v="$v"-dirty
+-	fi
+-else
+-	v="$VERSION"
+-fi
++v="$VERSION"
+ 
+ echo '#include "iw.h"' > "$OUT"
+ echo "const char iw_version[] = \"$v\";" >> "$OUT"
