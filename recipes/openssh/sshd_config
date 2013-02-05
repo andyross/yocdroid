@@ -1,0 +1,6 @@
+# Minimal Yocdroid sshd configuration.  Default upstream values, with UseDNS=no
+Compression no
+ClientAliveInterval 15
+ClientAliveCountMax 4
+Subsystem sftp /usr/libexec/sftp-server
+UseDNS no
