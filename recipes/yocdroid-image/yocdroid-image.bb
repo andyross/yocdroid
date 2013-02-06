@@ -26,8 +26,10 @@ IMAGE_INSTALL = " \
     base-files \
     bash \
     bc \
+    bind-utils \
     binutils \
     binutils-symlinks \
+    bluez4 \
     busybox \
     bzip2 \
     coreutils \
@@ -49,6 +51,7 @@ IMAGE_INSTALL = " \
     iptables \
     iputils \
     iw \
+    kmod \
     ldd \
     less \
     lvm2-dm \
@@ -82,6 +85,7 @@ IMAGE_INSTALL = " \
     tcpdump \
     tcp-wrappers \
     time \
+    tmux \
     tzdata \
     unzip \
     update-alternatives-cworth \
@@ -94,7 +98,6 @@ IMAGE_INSTALL = " \
     yocdroid-scripts \
     zip \
 "
-
 
 X86_EXTRA = " \
     acpid \

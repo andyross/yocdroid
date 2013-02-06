@@ -1,0 +1,23 @@
+Remove host-polluting directory from default Makefile flags
+
+Upstream-status: innapropriate (embedded)
+
+diff --git a/Makefile.am b/Makefile.am
+index 672208b..be71556 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -34,12 +34,12 @@ CFLAGS += -Wundef -Wbad-function-cast -Winline -Wcast-align
+ CPPFLAGS += -DDEBUG
+ endif
+ if IS_GCC4
+-CPPFLAGS += -iquote. -I/usr/local/include
++CPPFLAGS += -iquote.
+ if IS_DEBUG
+ CFLAGS += -Wno-pointer-sign
+ endif
+ else
+-CPPFLAGS += -I. -I- -I/usr/local/include
++CPPFLAGS += -I. -I-
+ endif
+ endif
+ 
