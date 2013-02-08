@@ -41,6 +41,7 @@ IMAGE_INSTALL = " \
     ed \
     elfutils \
     ethtool \
+    evtest \
     file \
     findutils \
     gawk \
