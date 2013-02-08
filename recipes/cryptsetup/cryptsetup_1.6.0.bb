@@ -11,5 +11,7 @@ SRC_URI = "http://cryptsetup.googlecode.com/files/cryptsetup-1.6.0.tar.bz2"
 SRC_URI[md5sum] = "99002ac59a65ea371e7a98200943cb80"
 SRC_URI[sha256sum] = "dd9686fce5d3276b2eb2ac40d513a9b64850af8fff881442f2cfe87257ba2406"
 
+DEPENDS = "lvm2"
+
 inherit autotools gettext
 
