@@ -24,11 +24,4 @@
 + Figure out valgrind's error with /system/bin/linker.  Apparently
   this should work per the valgrind site.
 
-+ Make non-arch links for the binutils binaries so the user can do
-  e.g. "readelf" instead of "$ARCH-readelf" on the target.
-
-+ Turn off UseDNS in the sshd config
-
-+ tmux recipe?  I hate screen...
-
 + Figure out logwrapper for mountd

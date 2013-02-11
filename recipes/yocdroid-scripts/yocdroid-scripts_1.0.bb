@@ -9,6 +9,7 @@ SRC_URI = "file://yocdroid-start \
            file://yocdroid-run \
            file://yocdroid-dnswatch \
            file://yocdroid-dnswatch.init \
+           file://yocdroid-modules \
            file://syscall-asm.h \
            file://chroot-static.c \
            file://yocdroid-mountd.c \
@@ -40,4 +41,5 @@ do_install() {
     install -D -m 0644 ../yocdroid-shell.sh      ${D}${sysconfdir}/profile.d/yocdroid-shell.sh
     install -D -m 0755 ../yocdroid-dnswatch      ${D}${sbindir}/yocdroid-dnswatch
     install -D -m 0755 ../yocdroid-dnswatch.init ${D}${sysconfdir}/init.d/yocdroid-dnswatch
+    install -D -m 0755 ../yocdroid-modules       ${D}${sysconfdir}/init.d/yocdroid-modules
 }

@@ -1,0 +1,17 @@
+#!/bin/sh
+### BEGIN INIT INFO
+# Provides:          yocdroid-modules
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: Mirror kernel modules
+# Description:       Maintains yocdroid-space links to the kernel
+#                    modules such that yocdroid kmod utilities can be
+#                    used at runtime.
+### END INIT INFO
+
+if [ "$1" = start ]; then
+    D=/lib/modules/`uname -r`
+    mkdir -p $D
+    ln -sf /system/lib/modules/* $D
+    /sbin/depmod
+fi
