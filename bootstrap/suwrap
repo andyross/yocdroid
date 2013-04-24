@@ -22,10 +22,11 @@ if grep -q 'com\.noshufou\.android\.su' $SU; then
    # "-c" argument must (!) be a single string which is then parsed by
    # a subshell.
    exec $SU -c "$*"
+elif grep -q 'com\.koushikdutta\.superuser' $SU; then
+   # Similar one shipped with more recent CM variants
+   exec $SU -c "$*"
 else
-   # Google's AOSP su is non-standard, but installed by default on
-   # "real" development images.  It's -c syntax marks the beginning of
-   # *pre-parsed* arguments, the first of which must (!) be an
-   # executable file path to exec.
+   # AOSP su doesn't parse the command, so it must be passed in
+   # multiple whitespace-separated arguments
    exec $SU -c "$@"
 fi
