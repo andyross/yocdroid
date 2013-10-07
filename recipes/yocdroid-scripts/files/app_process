@@ -5,7 +5,7 @@
 # system library directories, and there is no equivalent to ld.so.conf
 # to tell it to use more.  So Android programs run from app_process
 # need to get the rest via LD_LIBRARY_PATH, which conflicts with the
-# Yocdroid environment and needs to be wrapper here.
+# Yocdroid environment and needs to be wrapped here.
 
 export $(tr '\000' '\n' < /proc/$(pidof zygote)/environ | grep '^LD_LIBRARY_PATH=')
 exec /system/bin/app_process "$@"

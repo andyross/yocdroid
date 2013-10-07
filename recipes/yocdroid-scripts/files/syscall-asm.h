@@ -2,7 +2,7 @@
 #define _SYSCALL_ASM_H
 
 /*
- * Tiny syscall wrappers suitable buidling without a C library.
+ * Tiny syscall wrappers suitable for buidling without a C library.
  *
  * There is no AOSP chroot tool, so we have to provide our own.
  * Likewise some Yocdroid work must be done outside the chroot

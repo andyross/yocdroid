@@ -1,5 +1,9 @@
 BUGS:
 
++ The /mnt filesystems collide.  Specifically the /mnt/sdcard symlink
+  from the Android host doesn't appear in the chroot, though the
+  /mnt/shell/emulated submount is fine.
+
 + No meaningful effort has been made to secure the installation.
   There are no known holes (it lives in /data/y, which is not writable
   to apps), but for the moment it's safest to assume that a clever

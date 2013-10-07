@@ -1,8 +1,11 @@
 #!/system/bin/sh
 
-# Yocdroid install-time busybox wrapper.  Supports multiple install locations.
+# Yocdroid install-time busybox wrapper.  Supports multiple install
+# locations.  Also checks /data as a final fallback, allowing a root
+# user to pull a static binary from
+# e.g. http://busybox.net/downloads/binaries/ and drop it there.
 
-for d in /system/bin /system/xbin /system/xbin/busybox; do
+for d in /system/bin /system/xbin /system/xbin/busybox /data; do
     if [ -f "$d/busybox" -a -x "$d/busybox" ]; then
 	BB=$d/busybox
     fi

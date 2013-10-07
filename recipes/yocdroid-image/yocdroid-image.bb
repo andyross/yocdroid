@@ -100,6 +100,9 @@ IMAGE_INSTALL = " \
     zip \
 "
 
+# Make & gcc are sometimes useful, adds ~50MB unpacked
+#IMAGE_INSTALL += "make gcc g++ gcc-symlinks g++-symlinks cpp cpp-symlinks eglibc-dev libgcc-dev libstdc++-dev"
+
 X86_EXTRA = " \
     acpid \
     libacpi \

@@ -21,17 +21,20 @@ Building
 ========
 
 You will need a Poky linux tree in the local directory (a symlink
-works fine) as "./poky".  You can get this from the upstream git with:
+works fine) as "./poky".  Currently Yocdroid supports the 9.0 "Dylan"
+release.  You can get this from the upstream git with:
 
     git clone git://git.yoctoproject.org/poky
+    cd poky
+    git checkout dylan
 
 Building an image is broadly as simple as "make".  The target
 architecture can be specified by passing a MACHINE variable to make.
 Choices currently supported are "yd-arm" (most compatible, and
-default), "yd-armv7" (for modern devices) and "yd-x86" (for IA32
-machines), e.g.:
+default), "yd-armv7" (for ARM Cortex A8 and later CPUs, basically all
+modern devices) and "yd-x86" (for IA32 machines), e.g.:
 
-    make MACHINE=yd-arm
+    make MACHINE=yd-armv7
 
 The build process will automatically download original source tarballs
 for all the installed software (typically from high performance
@@ -53,7 +56,10 @@ The tarball produced by the build (which you can find in
 target.  You can do this manually (as root), or use the "make install"
 target that does this automatically over adb to the default connected
 device, though it currently depends on finding an installed busybox
-(for tar/bzip2).
+(for tar/bzip2).  If you lack busybox on your Android image, you can
+get a static binary from http://busybox.net/downloads/binaries/ and
+drop it in /data/ on your device (remember to "chmod 755
+/data/busybox" too!).
 
 Optionally, there is a "make install-ssh" target available to
 bootstrap ssh authentication over adb using the current user's public
@@ -110,7 +116,7 @@ call it as part of a larger script.
 Hacking
 =======
 
-Yocdroid is a based the Yocto Project's Poky Linux distribution, and
+Yocdroid is based on the Yocto Project's Poky Linux distribution, and
 uses openembedded-style (aside: yes, all three names get used to refer
 to what is for most purposes the same code base) recipes that can be
 modified as you expect.
