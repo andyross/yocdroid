@@ -23,7 +23,7 @@ BB_ENV_EXTRAWHITE = MACHINE DISTRO TCMODE TCLIBC http_proxy ftp_proxy	\
                     SOCKS5_PASSWD SOCKS5_USER SCREENDIR
 export OEROOT MACHINE PATH BB_ENV_EXTRAWHITE
 
-IMGFILE = tmp/deploy/images/yocdroid-image-$(MACHINE).tar.bz2
+IMGFILE = tmp/deploy/images/$(MACHINE)/yocdroid-image-$(MACHINE).tar.bz2
 D = /data/y
 
 image: pokycheck
